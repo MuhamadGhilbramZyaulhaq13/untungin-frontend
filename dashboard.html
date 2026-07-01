@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Untungin — Dashboard</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #0f0f0f; --white: #ffffff;
+    --gray-50: #f8f8f7; --gray-100: #f0f0ee; --gray-200: #e2e2df;
+    --gray-400: #a8a8a4; --gray-600: #6b6b67; --gray-800: #2c2c2a;
+    --green: #16a34a; --red: #dc2626;
+    --radius-md: 10px; --radius-lg: 14px; --radius-xl: 20px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  body { font-family: var(--font); background: var(--gray-50); color: var(--black); min-height: 100vh; }
+
+  /* ── NAVBAR ── */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 60px;
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .nav-logo { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; display: flex; align-items: center; gap: 6px; text-decoration: none; color: var(--black); }
+  .nav-logo-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--black); }
+  .btn { border: none; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; padding: 7px 16px; font-family: var(--font); }
+  .btn-ghost { background: transparent; border: 1px solid var(--gray-200); color: var(--black); }
+  .btn-ghost:hover { background: var(--gray-50); }
+  .btn-solid { background: var(--black); color: var(--white); }
+  .btn-solid:hover { background: var(--gray-800); }
+  .btn-danger { background: transparent; border: 1px solid #fecaca; color: var(--red); }
+  .btn-danger:hover { background: #fef2f2; }
+
+  /* ── LAYOUT ── */
+  .page { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+  .page-header { margin-bottom: 32px; }
+  .page-title { font-size: 24px; font-weight: 600; letter-spacing: -0.5px; }
+  .page-sub { font-size: 14px; color: var(--gray-600); margin-top: 4px; }
+
+  .grid { display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start; }
+
+  /* ── SIDEBAR ── */
+  .sidebar { display: flex; flex-direction: column; gap: 12px; }
+  .profile-card {
+    background: var(--white); border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg); padding: 24px; text-align: center;
+  }
+  .avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--black); color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 600; margin: 0 auto 14px;
+    letter-spacing: -1px;
+  }
+  .profile-name { font-size: 16px; font-weight: 600; margin-bottom: 3px; }
+  .profile-email { font-size: 12px; color: var(--gray-400); margin-bottom: 12px; }
+  .profile-badge {
+    display: inline-block; font-size: 11px; padding: 3px 10px;
+    background: var(--gray-50); border: 1px solid var(--gray-200);
+    border-radius: 20px; color: var(--gray-600); margin-bottom: 16px;
+  }
+  .profile-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+  .profile-stat { background: var(--gray-50); border-radius: var(--radius-md); padding: 10px; }
+  .profile-stat-num { font-size: 18px; font-weight: 600; }
+  .profile-stat-lbl { font-size: 11px; color: var(--gray-600); margin-top: 1px; }
+
+  .side-nav { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden; }
+  .side-nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; font-size: 13px; font-weight: 500;
+    color: var(--gray-600); cursor: pointer; border-bottom: 1px solid var(--gray-100);
+    transition: all 0.15s; text-decoration: none;
+  }
+  .side-nav-item:last-child { border-bottom: none; }
+  .side-nav-item:hover { background: var(--gray-50); color: var(--black); }
+  .side-nav-item.active { background: var(--black); color: var(--white); }
+  .side-nav-item span { font-size: 16px; }
+
+  /* ── MAIN CONTENT ── */
+  .main { display: flex; flex-direction: column; gap: 16px; }
+  .card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 24px; }
+  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .card-sub { font-size: 13px; color: var(--gray-600); margin-bottom: 20px; }
+  .card-divider { border: none; border-top: 1px solid var(--gray-100); margin: 20px 0; }
+
+  /* ── FORM ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--gray-800); }
+  .form-input {
+    padding: 10px 14px; border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md); font-size: 14px; outline: none;
+    font-family: var(--font); color: var(--black); background: var(--white);
+    transition: border-color 0.15s;
+  }
+  .form-input:focus { border-color: var(--gray-600); }
+  .form-input:disabled { background: var(--gray-50); color: var(--gray-400); cursor: not-allowed; }
+  .form-hint { font-size: 11px; color: var(--gray-400); }
+
+  .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* ── SUBMIT BTN ── */
+  .save-btn {
+    padding: 10px 24px; background: var(--black); color: var(--white);
+    border: none; border-radius: var(--radius-md); font-size: 13px;
+    font-weight: 600; cursor: pointer; transition: background 0.15s;
+    display: flex; align-items: center; gap: 6px; font-family: var(--font);
+  }
+  .save-btn:hover { background: var(--gray-800); }
+  .save-btn:disabled { background: var(--gray-200); color: var(--gray-400); cursor: not-allowed; }
+  .save-btn .spinner {
+    width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white; border-radius: 50%;
+    animation: spin 0.7s linear infinite; display: none;
+  }
+  .save-btn.loading .spinner { display: block; }
+  .save-btn.loading .lbl { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── INFO ROWS ── */
+  .info-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid var(--gray-100); font-size: 13px;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { color: var(--gray-600); }
+  .info-value { font-weight: 500; }
+
+  /* ── DANGER ZONE ── */
+  .danger-card {
+    border: 1px solid #fecaca; border-radius: var(--radius-lg);
+    padding: 20px; background: #fff;
+  }
+  .danger-title { font-size: 14px; font-weight: 600; color: var(--red); margin-bottom: 4px; }
+  .danger-desc { font-size: 13px; color: var(--gray-600); margin-bottom: 14px; }
+
+  /* ── LOADING STATE ── */
+  .skeleton {
+    background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-50) 50%, var(--gray-100) 75%);
+    background-size: 200% 100%; animation: shimmer 1.2s infinite;
+    border-radius: 6px;
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 999;
+    background: var(--black); color: var(--white);
+    padding: 12px 20px; border-radius: var(--radius-md);
+    font-size: 13px; font-weight: 500;
+    transform: translateY(80px); opacity: 0;
+    transition: all 0.25s ease; pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 700px) {
+    .nav { padding: 0 20px; }
+    .page { padding: 24px 16px; }
+    .grid { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="nav">
+  <a href="untungin.html" class="nav-logo">
+    <div class="nav-logo-dot"></div>
+    Untungin
+  </a>
+  <div style="display:flex;gap:8px;align-items:center">
+    <a href="untungin.html" class="btn btn-ghost">← Kembali ke toko</a>
+    <button class="btn btn-danger" onclick="handleLogout()">Keluar</button>
+  </div>
+</nav>
+
+<!-- MAIN PAGE -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">Dashboard</div>
+    <div class="page-sub">Kelola akun dan profil bisnis kamu</div>
+  </div>
+
+  <div class="grid">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <!-- Profile Card -->
+      <div class="profile-card">
+        <div class="avatar" id="avatarEl">?</div>
+        <div class="profile-name" id="profileName">Memuat...</div>
+        <div class="profile-email" id="profileEmail">—</div>
+        <div class="profile-badge" id="profileBiz">—</div>
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <div class="profile-stat-num" id="statOrders">0</div>
+            <div class="profile-stat-lbl">Pembelian</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-num" id="statJoined">—</div>
+            <div class="profile-stat-lbl">Bergabung</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side Nav -->
+      <div class="side-nav">
+        <a class="side-nav-item active" onclick="showSection('profile')">
+          <span>👤</span> Profil saya
+        </a>
+        <a class="side-nav-item" onclick="showSection('security')">
+          <span>🔒</span> Keamanan
+        </a>
+        <a class="side-nav-item" onclick="window.location.href='orders.html'">
+          <span>🧾</span> Riwayat pembelian
+        </a>
+        <a class="side-nav-item" href="untungin.html">
+          <span>🛒</span> Belanja sekarang
+        </a>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+      <!-- PROFIL SECTION -->
+      <div id="sectionProfile">
+        <div class="card">
+          <div class="card-title">Informasi pribadi</div>
+          <div class="card-sub">Perbarui nama dan info kontak kamu</div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Nama lengkap</label>
+              <input type="text" class="form-input" id="inputName" placeholder="Nama kamu">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" id="inputEmail" disabled>
+              <div class="form-hint">Email tidak dapat diubah</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nama bisnis</label>
+              <input type="text" class="form-input" id="inputBizName" placeholder="Nama toko / bisnis kamu">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nomor HP / WhatsApp</label>
+              <input type="tel" class="form-input" id="inputPhone" placeholder="08xxxxxxxxxx">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-ghost" onclick="loadProfile()">Reset</button>
+            <button class="save-btn" id="saveProfileBtn" onclick="saveProfile()">
+              <div class="spinner"></div>
+              <span class="lbl">Simpan perubahan</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Info akun -->
+        <div class="card">
+          <div class="card-title">Info akun</div>
+          <div class="info-row">
+            <span class="info-label">Status akun</span>
+            <span class="info-value" style="color:var(--green)">✅ Aktif</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Tanggal bergabung</span>
+            <span class="info-value" id="infoJoined">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Total pembelian</span>
+            <span class="info-value" id="infoOrders">0 transaksi</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Tipe akun</span>
+            <span class="info-value">Pelanggan UMKM</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KEAMANAN SECTION -->
+      <div id="sectionSecurity" style="display:none">
+        <div class="card">
+          <div class="card-title">Ganti kata sandi</div>
+          <div class="card-sub">Pastikan kata sandi baru minimal 8 karakter</div>
+
+          <div class="form-grid">
+            <div class="form-group full">
+              <label class="form-label">Kata sandi saat ini</label>
+              <input type="password" class="form-input" id="inputCurrentPw" placeholder="Masukkan kata sandi lama">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Kata sandi baru</label>
+              <input type="password" class="form-input" id="inputNewPw" placeholder="Minimal 8 karakter">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Konfirmasi kata sandi baru</label>
+              <input type="password" class="form-input" id="inputConfirmPw" placeholder="Ulangi kata sandi baru">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="save-btn" id="savePwBtn" onclick="savePassword()">
+              <div class="spinner"></div>
+              <span class="lbl">Ganti kata sandi</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="danger-card">
+          <div class="danger-title">Zona berbahaya</div>
+          <div class="danger-desc">Keluar dari semua perangkat akan menghapus sesi aktif kamu.</div>
+          <button class="btn btn-danger" onclick="handleLogout()">Keluar dari akun ini</button>
+        </div>
+      </div>
+
+      <!-- RIWAYAT SECTION -->
+      <div id="sectionOrders" style="display:none">
+        <div class="card">
+          <div class="card-title">Riwayat pembelian</div>
+          <div style="text-align:center;padding:20px 0">
+            <p style="font-size:14px;color:var(--gray-600);margin-bottom:16px">
+              Lihat semua riwayat transaksi dan license key kamu
+            </p>
+            <a href="orders.html" style="display:inline-block;padding:10px 24px;background:var(--black);color:var(--white);border-radius:var(--radius-md);font-size:13px;font-weight:600;text-decoration:none">
+              Buka riwayat transaksi →
+            </a>
+          </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+const API_BASE = 'https://untungin-backend.vercel.app';
+
+// ── AUTH GUARD ──
+const token = localStorage.getItem('untungin_token');
+if (!token) window.location.href = 'auth.html';
+
+// ── SECTION TOGGLE ──
+function showSection(name) {
+  ['Profile','Security','Orders'].forEach(s => {
+    document.getElementById('section' + s).style.display = 'none';
+  });
+  document.querySelectorAll('.side-nav-item').forEach(el => el.classList.remove('active'));
+
+  const map = { profile: 'Profile', security: 'Security', orders: 'Orders' };
+  document.getElementById('section' + map[name]).style.display = 'block';
+  event.currentTarget.classList.add('active');
+}
+
+// ── LOAD PROFILE ──
+async function loadProfile() {
+  try {
+    const res  = await fetch(API_BASE + '/api/user/profile', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      if (res.status === 401) { handleLogout(true); return; }
+      showToast('❌ Gagal memuat profil');
+      return;
+    }
+
+    const u = data.user;
+
+    // Update sidebar
+    const initials = u.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('avatarEl').textContent    = initials;
+    document.getElementById('profileName').textContent = u.name;
+    document.getElementById('profileEmail').textContent = u.email;
+    document.getElementById('profileBiz').textContent  = u.businessName || 'Belum diisi';
+
+    const joined = new Date(u.createdAt).toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
+    document.getElementById('statJoined').textContent  = joined;
+    document.getElementById('infoJoined').textContent  = new Date(u.createdAt).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+
+    // Update form
+    document.getElementById('inputName').value    = u.name;
+    document.getElementById('inputEmail').value   = u.email;
+    document.getElementById('inputBizName').value = u.businessName || '';
+    document.getElementById('inputPhone').value   = u.phone || '';
+
+    // Update localStorage
+    localStorage.setItem('untungin_user', JSON.stringify(u));
+
+  } catch (err) {
+    showToast('❌ Tidak dapat terhubung ke server');
+    console.error(err);
+  }
+}
+
+// ── SAVE PROFILE ──
+async function saveProfile() {
+  const name        = document.getElementById('inputName').value.trim();
+  const businessName = document.getElementById('inputBizName').value.trim();
+  const phone       = document.getElementById('inputPhone').value.trim();
+
+  if (!name) { showToast('Nama tidak boleh kosong'); return; }
+
+  setLoading('saveProfileBtn', true);
+  try {
+    const res  = await fetch(API_BASE + '/api/user/profile', {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body:    JSON.stringify({ name, businessName, phone }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) { showToast('❌ ' + (data.error || 'Gagal menyimpan')); return; }
+
+    // Update localStorage & sidebar
+    localStorage.setItem('untungin_user', JSON.stringify(data.user));
+    document.getElementById('profileName').textContent = data.user.name;
+    document.getElementById('profileBiz').textContent  = data.user.businessName || 'Belum diisi';
+    const initials = data.user.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('avatarEl').textContent = initials;
+
+    showToast('✅ Profil berhasil disimpan!');
+  } catch (err) {
+    showToast('❌ Tidak dapat terhubung ke server');
+  } finally {
+    setLoading('saveProfileBtn', false);
+  }
+}
+
+// ── SAVE PASSWORD ──
+async function savePassword() {
+  const currentPassword = document.getElementById('inputCurrentPw').value;
+  const newPassword     = document.getElementById('inputNewPw').value;
+  const confirmPassword = document.getElementById('inputConfirmPw').value;
+
+  if (!currentPassword || !newPassword) { showToast('Isi semua field kata sandi'); return; }
+  if (newPassword !== confirmPassword)   { showToast('Konfirmasi kata sandi tidak cocok'); return; }
+  if (newPassword.length < 8)           { showToast('Kata sandi baru minimal 8 karakter'); return; }
+
+  setLoading('savePwBtn', true);
+  try {
+    const res  = await fetch(API_BASE + '/api/user/profile', {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body:    JSON.stringify({ currentPassword, newPassword }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) { showToast('❌ ' + (data.error || 'Gagal mengganti kata sandi')); return; }
+
+    showToast('✅ Kata sandi berhasil diperbarui!');
+    document.getElementById('inputCurrentPw').value = '';
+    document.getElementById('inputNewPw').value     = '';
+    document.getElementById('inputConfirmPw').value = '';
+  } catch (err) {
+    showToast('❌ Tidak dapat terhubung ke server');
+  } finally {
+    setLoading('savePwBtn', false);
+  }
+}
+
+// ── LOGOUT ──
+function handleLogout(auto = false) {
+  if (!auto && !confirm('Yakin ingin keluar dari akun Untungin?')) return;
+  localStorage.removeItem('untungin_token');
+  localStorage.removeItem('untungin_user');
+  window.location.href = 'auth.html';
+}
+
+// ── HELPERS ──
+function setLoading(id, on) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.classList.toggle('loading', on);
+  btn.disabled = on;
+}
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── INIT ──
+loadProfile();
+</script>
+</body>
+</html>

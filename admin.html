@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Untungin — Admin Panel</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #0f0f0f; --white: #ffffff;
+    --gray-50: #f8f8f7; --gray-100: #f0f0ee; --gray-200: #e2e2df;
+    --gray-400: #a8a8a4; --gray-600: #6b6b67; --gray-800: #2c2c2a;
+    --green: #16a34a; --red: #dc2626; --amber: #d97706;
+    --radius-md: 10px; --radius-lg: 14px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  body { font-family: var(--font); background: var(--gray-50); color: var(--black); min-height: 100vh; }
+
+  /* ── NAVBAR ── */
+  .nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 56px; background: var(--black); color: var(--white); }
+  .nav-logo { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 6px; color: var(--white); text-decoration: none; }
+  .nav-badge { font-size: 10px; padding: 2px 8px; background: rgba(255,255,255,0.15); border-radius: 4px; font-weight: 500; }
+  .nav-right { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .nav-right a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 13px; }
+  .nav-right a:hover { color: var(--white); }
+
+  /* ── LAYOUT ── */
+  .layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 56px); }
+
+  /* ── SIDEBAR ── */
+  .sidebar { background: var(--white); border-right: 1px solid var(--gray-200); padding: 20px 0; }
+  .side-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--gray-600); cursor: pointer; transition: all 0.15s; border-left: 3px solid transparent; }
+  .side-item:hover { background: var(--gray-50); color: var(--black); }
+  .side-item.active { background: var(--gray-50); color: var(--black); border-left-color: var(--black); }
+  .side-item span { font-size: 16px; }
+  .side-label { font-size: 10px; font-weight: 600; letter-spacing: 1px; color: var(--gray-400); text-transform: uppercase; padding: 16px 20px 6px; }
+
+  /* ── MAIN ── */
+  .main { padding: 28px 32px; }
+  .main-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .main-title { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
+  .main-sub { font-size: 13px; color: var(--gray-600); margin-top: 2px; }
+
+  /* ── STATS ── */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 18px; }
+  .stat-num { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; }
+  .stat-lbl { font-size: 12px; color: var(--gray-600); margin-top: 3px; }
+  .stat-change { font-size: 11px; margin-top: 6px; }
+
+  /* ── BUTTONS ── */
+  .btn { border: none; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; padding: 8px 16px; font-family: var(--font); display: inline-flex; align-items: center; gap: 6px; }
+  .btn-black { background: var(--black); color: var(--white); }
+  .btn-black:hover { background: var(--gray-800); }
+  .btn-ghost { background: transparent; border: 1px solid var(--gray-200); color: var(--black); }
+  .btn-ghost:hover { background: var(--gray-50); }
+  .btn-danger { background: transparent; border: 1px solid #fecaca; color: var(--red); }
+  .btn-danger:hover { background: #fef2f2; }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+  /* ── TABLE ── */
+  .table-wrap { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden; }
+  .table-toolbar { display: flex; align-items: center; gap: 10px; padding: 16px 20px; border-bottom: 1px solid var(--gray-200); flex-wrap: wrap; }
+  .search-input { flex: 1; min-width: 200px; padding: 8px 14px; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 13px; outline: none; font-family: var(--font); }
+  .search-input:focus { border-color: var(--gray-600); }
+  .filter-select { padding: 8px 12px; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 13px; outline: none; font-family: var(--font); color: var(--black); background: var(--white); }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 11px; font-weight: 600; color: var(--gray-400); letter-spacing: 0.5px; text-transform: uppercase; padding: 10px 16px; border-bottom: 1px solid var(--gray-200); background: var(--gray-50); }
+  td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--gray-50); }
+  .product-img { width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--gray-100); border: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; overflow: hidden; }
+  .product-img img { width: 100%; height: 100%; object-fit: cover; }
+  .product-name { font-weight: 500; color: var(--black); }
+  .product-cat { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+  .badge-active { background: #f0fdf4; color: var(--green); border: 1px solid #bbf7d0; }
+  .badge-inactive { background: var(--gray-50); color: var(--gray-400); border: 1px solid var(--gray-200); }
+  .price-col { font-weight: 600; }
+  .actions { display: flex; gap: 6px; }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--gray-400); }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-text { font-size: 14px; font-weight: 500; margin-bottom: 4px; color: var(--gray-600); }
+  .empty-sub { font-size: 12px; }
+
+  /* ── MODAL ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--white); border-radius: 16px; width: 540px; max-width: 95vw; max-height: 90vh; overflow-y: auto; animation: modalUp 0.2s ease; }
+  @keyframes modalUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--gray-200); }
+  .modal-title { font-size: 16px; font-weight: 600; }
+  .modal-close { width: 28px; height: 28px; border-radius: 50%; background: var(--gray-100); border: none; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+  .modal-body { padding: 24px; }
+  .modal-footer { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 8px; }
+
+  /* ── FORM ── */
+  .form-group { margin-bottom: 16px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-800); margin-bottom: 6px; }
+  .form-input { width: 100%; padding: 9px 13px; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 13px; outline: none; font-family: var(--font); color: var(--black); transition: border-color 0.15s; }
+  .form-input:focus { border-color: var(--gray-600); }
+  textarea.form-input { resize: vertical; min-height: 80px; }
+  .form-hint { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
+
+  /* Image preview */
+  .img-preview { width: 80px; height: 80px; border-radius: var(--radius-md); background: var(--gray-100); border: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: center; font-size: 28px; margin-top: 8px; overflow: hidden; }
+  .img-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* Submit btn */
+  .submit-btn { padding: 9px 22px; background: var(--black); color: var(--white); border: none; border-radius: var(--radius-md); font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font); display: flex; align-items: center; gap: 6px; }
+  .submit-btn:disabled { background: var(--gray-200); color: var(--gray-400); cursor: not-allowed; }
+  .submit-btn .spin { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+  .submit-btn.loading .spin { display: block; }
+  .submit-btn.loading .lbl { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── TOAST ── */
+  .toast { position: fixed; bottom: 24px; right: 24px; z-index: 999; background: var(--black); color: var(--white); padding: 11px 18px; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; transform: translateY(80px); opacity: 0; transition: all 0.25s; pointer-events: none; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 768px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .main { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="nav">
+  <a href="untungin.html" class="nav-logo">
+    ● Untungin <span class="nav-badge">Admin</span>
+  </a>
+  <div class="nav-right">
+    <a href="untungin.html">Lihat toko</a>
+    <a href="dashboard.html">Profil</a>
+    <a href="#" onclick="handleLogout()" style="color:#fca5a5">Keluar</a>
+  </div>
+</nav>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="side-label">Menu</div>
+    <div class="side-item active" onclick="showSection('products',this)"><span>📦</span> Produk</div>
+    <div class="side-item" onclick="showSection('users',this)"><span>👥</span> Pengguna</div>
+    <div class="side-item" onclick="showSection('orders',this)"><span>🧾</span> Transaksi</div>
+    <div class="side-item" onclick="showSection('reports',this)"><span>📊</span> Laporan</div>
+    <div class="side-label">Toko</div>
+    <div class="side-item" onclick="window.location.href='untungin.html'"><span>🛒</span> Lihat toko</div>
+    <div class="side-item" onclick="window.location.href='dashboard.html'"><span>⚙️</span> Profil saya</div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- PRODUCTS SECTION -->
+    <div id="sectionProducts">
+      <div class="main-header">
+        <div>
+          <div class="main-title">Manajemen Produk</div>
+          <div class="main-sub">Tambah, edit, dan kelola katalog produk</div>
+        </div>
+        <button class="btn btn-black" onclick="openModal()">+ Tambah produk</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-num" id="statTotal">—</div>
+          <div class="stat-lbl">Total produk</div>
+          <div class="stat-change" style="color:var(--green)">● Aktif semua</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statActive">—</div>
+          <div class="stat-lbl">Produk aktif</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statCategories">—</div>
+          <div class="stat-lbl">Kategori</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statAvgPrice">—</div>
+          <div class="stat-lbl">Harga rata-rata</div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <input type="text" class="search-input" id="searchInput" placeholder="🔍 Cari produk..." oninput="filterProducts()">
+          <select class="filter-select" id="filterCat" onchange="filterProducts()">
+            <option value="">Semua kategori</option>
+            <option>Kasir & POS</option>
+            <option>Pembukuan</option>
+            <option>Inventory</option>
+            <option>Payroll</option>
+            <option>Invoice</option>
+            <option>Laporan</option>
+            <option>Lainnya</option>
+          </select>
+          <select class="filter-select" id="filterStatus" onchange="filterProducts()">
+            <option value="">Semua status</option>
+            <option value="active">Aktif</option>
+            <option value="inactive">Nonaktif</option>
+          </select>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Produk</th>
+              <th>Kategori</th>
+              <th>Harga</th>
+              <th>Stok</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="productsTable">
+            <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">Memuat produk...</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- USERS SECTION -->
+    <div id="sectionUsers" style="display:none">
+      <div class="main-header">
+        <div><div class="main-title">Manajemen Pengguna</div><div class="main-sub">Kelola data pelanggan terdaftar</div></div>
+      </div>
+      <div class="stats" id="userStats">
+        <div class="stat-card"><div class="stat-num" id="uStatTotal">—</div><div class="stat-lbl">Total pengguna</div></div>
+        <div class="stat-card"><div class="stat-num" id="uStatActive">—</div><div class="stat-lbl">Pernah bertransaksi</div></div>
+        <div class="stat-card"><div class="stat-num" id="uStatNew">—</div><div class="stat-lbl">Baru bulan ini</div></div>
+        <div class="stat-card"><div class="stat-num" id="uStatRevenue">—</div><div class="stat-lbl">Total revenue dari user</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <input type="text" class="search-input" placeholder="🔍 Cari pengguna..." oninput="filterUsers(this.value)">
+        </div>
+        <table>
+          <thead><tr><th>Pengguna</th><th>Bisnis</th><th>Bergabung</th><th>Transaksi</th><th>Total Belanja</th></tr></thead>
+          <tbody id="usersTable"><tr><td colspan="5"><div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">Memuat...</div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ORDERS SECTION -->
+    <div id="sectionOrders" style="display:none">
+      <div class="main-header">
+        <div><div class="main-title">Manajemen Transaksi</div><div class="main-sub">Kelola dan validasi semua transaksi</div></div>
+      </div>
+      <div class="stats">
+        <div class="stat-card"><div class="stat-num" id="oStatTotal">—</div><div class="stat-lbl">Total order</div></div>
+        <div class="stat-card"><div class="stat-num" id="oStatPaid" style="color:#16a34a">—</div><div class="stat-lbl">Lunas</div></div>
+        <div class="stat-card"><div class="stat-num" id="oStatPending" style="color:#d97706">—</div><div class="stat-lbl">Menunggu</div></div>
+        <div class="stat-card"><div class="stat-num" id="oStatRevenue">—</div><div class="stat-lbl">Total revenue</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <input type="text" class="search-input" placeholder="🔍 Cari order ID atau email..." oninput="filterOrders(this.value)">
+          <select class="filter-select" onchange="filterOrdersByStatus(this.value)">
+            <option value="">Semua status</option>
+            <option value="paid">Lunas</option>
+            <option value="pending">Menunggu</option>
+            <option value="cancelled">Dibatalkan</option>
+          </select>
+        </div>
+        <table>
+          <thead><tr><th>Order ID</th><th>Pelanggan</th><th>Produk</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead>
+          <tbody id="ordersTable"><tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">Memuat...</div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REPORTS SECTION -->
+    <div id="sectionReports" style="display:none">
+      <div class="main-header">
+        <div><div class="main-title">Laporan Penjualan</div><div class="main-sub">Ringkasan pendapatan dan statistik</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" onclick="setChartPeriod('weekly')">7 Hari</button>
+          <button class="btn btn-ghost" onclick="setChartPeriod('monthly')">6 Bulan</button>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat-card"><div class="stat-num" id="rStatRevenue">—</div><div class="stat-lbl">Total pendapatan</div><div class="stat-change" style="color:#16a34a" id="rStatGrowth"></div></div>
+        <div class="stat-card"><div class="stat-num" id="rStatOrders">—</div><div class="stat-lbl">Total order lunas</div></div>
+        <div class="stat-card"><div class="stat-num" id="rStatAvg">—</div><div class="stat-lbl">Rata-rata per order</div></div>
+        <div class="stat-card"><div class="stat-num" id="rStatUsers">—</div><div class="stat-lbl">Total pengguna</div></div>
+      </div>
+      <!-- Chart -->
+      <div class="table-wrap" style="padding:24px;margin-bottom:16px">
+        <div style="font-size:14px;font-weight:600;margin-bottom:20px" id="chartTitle">Pendapatan 7 Hari Terakhir</div>
+        <div id="chartArea" style="height:220px;display:flex;align-items:flex-end;gap:8px;border-bottom:1px solid var(--gray-200);padding-bottom:8px"></div>
+        <div id="chartLabels" style="display:flex;gap:8px;margin-top:8px;font-size:11px;color:var(--gray-400)"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL TAMBAH/EDIT PRODUK -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Tambah produk baru</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editProductId">
+
+      <div class="form-group">
+        <label class="form-label">Nama produk *</label>
+        <input type="text" class="form-input" id="inputName" placeholder="Contoh: KasirKu Pro">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Deskripsi</label>
+        <textarea class="form-input" id="inputDesc" placeholder="Jelaskan fitur dan keunggulan produk..."></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Harga (Rp) *</label>
+          <input type="number" class="form-input" id="inputPrice" placeholder="149000" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stok / Lisensi</label>
+          <input type="number" class="form-input" id="inputStock" placeholder="999" min="0">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Kategori</label>
+          <select class="form-input" id="inputCategory">
+            <option value="Kasir & POS">Kasir & POS</option>
+            <option value="Pembukuan">Pembukuan</option>
+            <option value="Inventory">Inventory</option>
+            <option value="Payroll">Payroll</option>
+            <option value="Invoice">Invoice</option>
+            <option value="Laporan">Laporan</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-input" id="inputStatus">
+            <option value="true">Aktif (tampil di toko)</option>
+            <option value="false">Nonaktif (sembunyikan)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">URL Gambar produk</label>
+        <input type="url" class="form-input" id="inputImage" placeholder="https://..." oninput="previewImage(this.value)">
+        <div class="form-hint">Paste URL gambar dari internet atau upload ke imgbb.com</div>
+        <div class="img-preview" id="imgPreview">🖼️</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="submit-btn" id="submitBtn" onclick="saveProduct()">
+        <div class="spin"></div>
+        <span class="lbl">Simpan produk</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+const API_BASE = 'https://untungin-backend.vercel.app';
+const token    = localStorage.getItem('untungin_token');
+if (!token) window.location.href = 'auth.html';
+
+let allProducts = [];
+let allOrders   = [];
+let allUsers    = [];
+let chartData   = null;
+
+// ── SECTION TOGGLE ──
+function showSection(name, el) {
+  ['Products','Users','Orders','Reports'].forEach(s => {
+    document.getElementById('section' + s).style.display = 'none';
+  });
+  document.querySelectorAll('.side-item').forEach(e => e.classList.remove('active'));
+  document.getElementById('section' + name.charAt(0).toUpperCase() + name.slice(1)).style.display = 'block';
+  if (el) el.classList.add('active');
+  else if (event && event.currentTarget) event.currentTarget.classList.add('active');
+
+  // Load data sesuai section
+  if (name === 'users')   loadUsers();
+  if (name === 'orders')  loadAllOrders();
+  if (name === 'reports') loadReports();
+}
+
+// ── FORMAT HELPERS ──
+function formatRp(n) { return 'Rp ' + Number(n||0).toLocaleString('id-ID'); }
+function formatDate(d) { return new Date(d).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }); }
+
+// ── LOAD PRODUCTS ──
+async function loadProducts() {
+  try {
+    const res  = await fetch(API_BASE + '/api/products?limit=100', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast('❌ Gagal memuat produk'); return; }
+
+    allProducts = data.products || [];
+    updateStats();
+    renderTable(allProducts);
+  } catch (err) {
+    showToast('❌ Tidak dapat terhubung ke server');
+  }
+}
+
+function updateStats() {
+  const active = allProducts.filter(p => p.isActive).length;
+  const cats   = [...new Set(allProducts.map(p => p.category))].length;
+  const avg    = allProducts.length
+    ? Math.round(allProducts.reduce((s, p) => s + p.price, 0) / allProducts.length)
+    : 0;
+
+  document.getElementById('statTotal').textContent      = allProducts.length;
+  document.getElementById('statActive').textContent     = active;
+  document.getElementById('statCategories').textContent = cats;
+  document.getElementById('statAvgPrice').textContent   = avg ? 'Rp ' + (avg/1000).toFixed(0) + 'rb' : '—';
+}
+
+function renderTable(products) {
+  const tbody = document.getElementById('productsTable');
+  if (!products.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">
+      <div class="empty-icon">📦</div>
+      <div class="empty-text">Belum ada produk</div>
+      <div class="empty-sub">Klik "Tambah produk" untuk mulai</div>
+    </div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = products.map(p => `
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="product-img">
+            ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}" onerror="this.parentElement.textContent='📦'">` : '📦'}
+          </div>
+          <div>
+            <div class="product-name">${p.name}</div>
+            <div class="product-cat">${p.description ? p.description.slice(0,40) + '...' : '—'}</div>
+          </div>
+        </div>
+      </td>
+      <td><span style="font-size:12px;color:var(--gray-600)">${p.category}</span></td>
+      <td class="price-col">${formatRp(p.price)}</td>
+      <td style="font-size:13px">${p.stock >= 999 ? '∞' : p.stock}</td>
+      <td><span class="badge ${p.isActive ? 'badge-active' : 'badge-inactive'}">${p.isActive ? 'Aktif' : 'Nonaktif'}</span></td>
+      <td>
+        <div class="actions">
+          <button class="btn btn-ghost btn-sm" onclick="editProduct('${p._id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p._id}', '${p.name}')">Hapus</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ── FILTER ──
+function filterProducts() {
+  const q      = document.getElementById('searchInput').value.toLowerCase();
+  const cat    = document.getElementById('filterCat').value;
+  const status = document.getElementById('filterStatus').value;
+
+  const filtered = allProducts.filter(p => {
+    const matchQ   = !q || p.name.toLowerCase().includes(q) || (p.description || '').toLowerCase().includes(q);
+    const matchCat = !cat || p.category === cat;
+    const matchSt  = !status || (status === 'active' ? p.isActive : !p.isActive);
+    return matchQ && matchCat && matchSt;
+  });
+  renderTable(filtered);
+}
+
+// ── MODAL ──
+function openModal(product = null) {
+  document.getElementById('editProductId').value = product ? product._id : '';
+  document.getElementById('modalTitle').textContent = product ? 'Edit produk' : 'Tambah produk baru';
+  document.getElementById('inputName').value     = product ? product.name        : '';
+  document.getElementById('inputDesc').value     = product ? product.description : '';
+  document.getElementById('inputPrice').value    = product ? product.price       : '';
+  document.getElementById('inputStock').value    = product ? product.stock       : '999';
+  document.getElementById('inputCategory').value = product ? product.category    : 'Kasir & POS';
+  document.getElementById('inputStatus').value   = product ? String(product.isActive) : 'true';
+  document.getElementById('inputImage').value    = product ? product.imageUrl    : '';
+  document.getElementById('submitBtn').querySelector('.lbl').textContent = product ? 'Simpan perubahan' : 'Simpan produk';
+  previewImage(product ? product.imageUrl : '');
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+function previewImage(url) {
+  const preview = document.getElementById('imgPreview');
+  if (url && url.startsWith('http')) {
+    preview.innerHTML = `<img src="${url}" onerror="this.parentElement.textContent='🖼️'">`;
+  } else {
+    preview.textContent = '🖼️';
+  }
+}
+
+// ── SAVE PRODUCT ──
+async function saveProduct() {
+  const id       = document.getElementById('editProductId').value;
+  const name     = document.getElementById('inputName').value.trim();
+  const desc     = document.getElementById('inputDesc').value.trim();
+  const price    = document.getElementById('inputPrice').value;
+  const stock    = document.getElementById('inputStock').value;
+  const category = document.getElementById('inputCategory').value;
+  const isActive = document.getElementById('inputStatus').value === 'true';
+  const imageUrl = document.getElementById('inputImage').value.trim();
+
+  if (!name)  { showToast('Nama produk wajib diisi'); return; }
+  if (!price) { showToast('Harga produk wajib diisi'); return; }
+
+  const body = { name, description: desc, price: Number(price), stock: Number(stock), category, isActive, imageUrl };
+
+  setLoading(true);
+  try {
+    const url    = id ? `${API_BASE}/api/products/${id}` : `${API_BASE}/api/products`;
+    const method = id ? 'PUT' : 'POST';
+    const res    = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+
+    if (!res.ok) { showToast('❌ ' + (data.error || 'Gagal menyimpan produk')); return; }
+
+    showToast(id ? '✅ Produk berhasil diperbarui!' : '✅ Produk berhasil ditambahkan!');
+    closeModal();
+    loadProducts();
+  } catch (err) {
+    showToast('❌ Tidak dapat terhubung ke server');
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ── EDIT ──
+function editProduct(id) {
+  const product = allProducts.find(p => p._id === id);
+  if (product) openModal(product);
+}
+
+// ── DELETE ──
+async function deleteProduct(id, name) {
+  if (!confirm(`Nonaktifkan produk "${name}"?\n\nProduk akan disembunyikan dari toko tapi tidak dihapus permanen.`)) return;
+  try {
+    const res  = await fetch(`${API_BASE}/api/products/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token },
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast('❌ ' + (data.error || 'Gagal menghapus')); return; }
+    showToast('✅ Produk berhasil dinonaktifkan!');
+    loadProducts();
+  } catch (err) {
+    showToast('❌ Tidak dapat terhubung ke server');
+  }
+}
+
+// ── LOAD USERS ──
+async function loadUsers() {
+  try {
+    const res  = await fetch(API_BASE + '/api/admin/stats?type=users', { headers: { 'Authorization': 'Bearer ' + token } });
+    const data = await res.json();
+    if (!res.ok) { showToast('❌ Gagal memuat users'); return; }
+    allUsers = data.users || [];
+
+    const now      = new Date();
+    const thisMonth = allUsers.filter(u => {
+      const d = new Date(u.createdAt);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).length;
+    const withOrders = allUsers.filter(u => u.stats && u.stats.orders > 0).length;
+    const totalSpent = allUsers.reduce((s,u) => s + (u.stats?.spent || 0), 0);
+
+    document.getElementById('uStatTotal').textContent   = allUsers.length;
+    document.getElementById('uStatActive').textContent  = withOrders;
+    document.getElementById('uStatNew').textContent     = thisMonth;
+    document.getElementById('uStatRevenue').textContent = formatRp(totalSpent);
+
+    renderUsers(allUsers);
+  } catch (err) { showToast('❌ Tidak dapat terhubung ke server'); }
+}
+
+function renderUsers(users) {
+  const tbody = document.getElementById('usersTable');
+  if (!users.length) {
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">Belum ada pengguna</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = users.map(u => `
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--black);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0">
+            ${(u.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:500">${u.name || '—'}</div>
+            <div style="font-size:11px;color:var(--gray-400)">${u.email}</div>
+          </div>
+        </div>
+      </td>
+      <td style="font-size:13px;color:var(--gray-600)">${u.businessName || '—'}</td>
+      <td style="font-size:12px;color:var(--gray-400)">${formatDate(u.createdAt)}</td>
+      <td style="font-size:13px">${u.stats?.orders || 0} order</td>
+      <td style="font-size:13px;font-weight:500">${formatRp(u.stats?.spent || 0)}</td>
+    </tr>
+  `).join('');
+}
+
+function filterUsers(q) {
+  const filtered = allUsers.filter(u =>
+    u.name?.toLowerCase().includes(q.toLowerCase()) ||
+    u.email?.toLowerCase().includes(q.toLowerCase()) ||
+    u.businessName?.toLowerCase().includes(q.toLowerCase())
+  );
+  renderUsers(filtered);
+}
+
+// ── LOAD ALL ORDERS ──
+async function loadAllOrders() {
+  try {
+    const res  = await fetch(API_BASE + '/api/admin/stats?type=orders', { headers: { 'Authorization': 'Bearer ' + token } });
+    const data = await res.json();
+    if (!res.ok) { showToast('❌ Gagal memuat orders'); return; }
+    allOrders = data.orders || [];
+
+    const paid    = allOrders.filter(o => o.status === 'paid');
+    const pending = allOrders.filter(o => o.status === 'pending');
+    const revenue = paid.reduce((s,o) => s + (o.total||0), 0);
+
+    document.getElementById('oStatTotal').textContent   = allOrders.length;
+    document.getElementById('oStatPaid').textContent    = paid.length;
+    document.getElementById('oStatPending').textContent = pending.length;
+    document.getElementById('oStatRevenue').textContent = formatRp(revenue);
+
+    renderOrders(allOrders);
+  } catch (err) { showToast('❌ Tidak dapat terhubung ke server'); }
+}
+
+function renderOrders(orders) {
+  const tbody = document.getElementById('ordersTable');
+  if (!orders.length) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🧾</div><div class="empty-text">Belum ada transaksi</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = orders.map(o => {
+    const sc = o.status === 'paid' ? 'badge-active' : o.status === 'pending' ? '' : '';
+    const sl = o.status === 'paid' ? '✅ Lunas' : o.status === 'pending' ? '⏳ Menunggu' : '❌ Batal';
+    const sc2 = o.status === 'paid' ? 'color:#16a34a' : o.status === 'pending' ? 'color:#d97706' : 'color:var(--gray-400)';
+    const items = (o.items||[]).map(i => i.name).join(', ') || '—';
+    return `
+      <tr>
+        <td><div style="font-size:12px;font-family:monospace;font-weight:600">${o.orderId}</div><div style="font-size:11px;color:var(--gray-400)">${formatDate(o.createdAt)}</div></td>
+        <td><div style="font-size:13px;font-weight:500">${o.userName||'—'}</div><div style="font-size:11px;color:var(--gray-400)">${o.userEmail||''}</div></td>
+        <td style="font-size:12px;color:var(--gray-600);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${items}</td>
+        <td style="font-size:13px;font-weight:600">${formatRp(o.total)}</td>
+        <td><span style="font-size:12px;font-weight:500;${sc2}">${sl}</span></td>
+        <td>
+          <select style="font-size:11px;padding:4px 8px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer" onchange="updateOrderStatus('${o.orderId}', this.value, this)">
+            <option value="pending"  ${o.status==='pending'  ?'selected':''}>Menunggu</option>
+            <option value="paid"     ${o.status==='paid'     ?'selected':''}>Lunas</option>
+            <option value="cancelled"${o.status==='cancelled'?'selected':''}>Batal</option>
+          </select>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterOrders(q) {
+  const filtered = allOrders.filter(o =>
+    o.orderId?.toLowerCase().includes(q.toLowerCase()) ||
+    o.userEmail?.toLowerCase().includes(q.toLowerCase()) ||
+    o.userName?.toLowerCase().includes(q.toLowerCase())
+  );
+  renderOrders(filtered);
+}
+function filterOrdersByStatus(status) {
+  const filtered = status ? allOrders.filter(o => o.status === status) : allOrders;
+  renderOrders(filtered);
+}
+
+async function updateOrderStatus(orderId, status, selectEl) {
+  try {
+    const res = await fetch(API_BASE + '/api/admin/orders', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ orderId, status }),
+    });
+    const data = await res.json();
+    if (res.ok) { showToast('✅ Status order diperbarui!'); loadAllOrders(); }
+    else { showToast('❌ ' + (data.error || 'Gagal update status')); }
+  } catch { showToast('❌ Tidak dapat terhubung ke server'); }
+}
+
+// ── LOAD REPORTS ──
+let currentPeriod = 'weekly';
+async function loadReports() {
+  try {
+    const res  = await fetch(API_BASE + '/api/admin/stats?type=summary', { headers: { 'Authorization': 'Bearer ' + token } });
+    const data = await res.json();
+    if (!res.ok) { showToast('❌ Gagal memuat laporan'); return; }
+    chartData = data;
+
+    const { summary } = data;
+    const avg = summary.paidOrders > 0 ? Math.round(summary.totalRevenue / summary.paidOrders) : 0;
+
+    document.getElementById('rStatRevenue').textContent = formatRp(summary.totalRevenue);
+    document.getElementById('rStatOrders').textContent  = summary.paidOrders;
+    document.getElementById('rStatAvg').textContent     = formatRp(avg);
+    document.getElementById('rStatUsers').textContent   = summary.totalUsers;
+
+    // Update summary stats too
+    document.getElementById('statTotal').textContent      = summary.totalProducts;
+    document.getElementById('statActive').textContent     = summary.paidOrders;
+    document.getElementById('statCategories').textContent = summary.totalUsers;
+
+    renderChart(currentPeriod);
+  } catch (err) { showToast('❌ Tidak dapat terhubung ke server'); }
+}
+
+function setChartPeriod(period) {
+  currentPeriod = period;
+  renderChart(period);
+}
+
+function renderChart(period) {
+  if (!chartData) return;
+  const data   = period === 'weekly' ? chartData.weekly : chartData.monthly;
+  const maxVal = Math.max(...data.map(d => d.revenue), 1);
+
+  document.getElementById('chartTitle').textContent =
+    period === 'weekly' ? 'Pendapatan 7 Hari Terakhir' : 'Pendapatan 6 Bulan Terakhir';
+
+  document.getElementById('chartArea').innerHTML = data.map(d => {
+    const pct = Math.max((d.revenue / maxVal) * 100, d.revenue > 0 ? 8 : 2);
+    return `
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+        <div style="font-size:10px;color:var(--gray-600);font-weight:500">${d.revenue > 0 ? formatRp(d.revenue).replace('Rp ','') : ''}</div>
+        <div style="width:100%;height:${pct}%;background:${d.revenue>0?'var(--black)':'var(--gray-200)'};border-radius:4px 4px 0 0;min-height:4px;transition:height 0.3s"></div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('chartLabels').innerHTML = data.map(d => `
+    <div style="flex:1;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.date || d.label}</div>
+  `).join('');
+}
+
+// ── LOGOUT ──
+function handleLogout() {
+  localStorage.removeItem('untungin_token');
+  localStorage.removeItem('untungin_user');
+  window.location.href = 'auth.html';
+}
+
+// ── HELPERS ──
+function formatRp(n) { return 'Rp ' + n.toLocaleString('id-ID'); }
+function setLoading(on) {
+  const btn = document.getElementById('submitBtn');
+  btn.classList.toggle('loading', on);
+  btn.disabled = on;
+}
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+loadProducts();
+</script>
+</body>
+</html>

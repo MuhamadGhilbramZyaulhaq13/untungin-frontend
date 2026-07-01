@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Untungin — Masuk / Daftar</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #0f0f0f; --white: #ffffff;
+    --gray-50: #f8f8f7; --gray-100: #f0f0ee; --gray-200: #e2e2df;
+    --gray-400: #a8a8a4; --gray-600: #6b6b67; --gray-800: #2c2c2a;
+    --green: #16a34a; --red: #dc2626;
+    --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  html, body { height: 100%; font-family: var(--font); background: var(--white); color: var(--black); }
+  .auth-layout { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+  .left-panel {
+    background: var(--black); color: var(--white); padding: 48px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden;
+  }
+  .left-panel::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 10%, rgba(255,255,255,0.03) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .left-panel::after {
+    content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none;
+  }
+  .left-top { position: relative; z-index: 1; }
+  .left-logo { font-size: 20px; font-weight: 600; letter-spacing: -0.5px; display: flex; align-items: center; gap: 7px; color: var(--white); text-decoration: none; }
+  .left-logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--white); flex-shrink: 0; }
+  .left-main { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 60px 0; }
+  .left-eyebrow { font-size: 11px; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 20px; }
+  .left-headline { font-size: 40px; font-weight: 600; line-height: 1.1; letter-spacing: -1.5px; max-width: 360px; color: var(--white); }
+  .left-headline span { color: rgba(255,255,255,0.45); }
+  .left-desc { font-size: 15px; color: rgba(255,255,255,0.55); margin-top: 20px; max-width: 340px; line-height: 1.7; }
+  .left-features { display: flex; flex-direction: column; gap: 14px; margin-top: 40px; position: relative; z-index: 1; }
+  .left-feature { display: flex; align-items: center; gap: 12px; }
+  .left-feature-icon { width: 32px; height: 32px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .left-feature-text { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.4; }
+  .left-feature-text strong { color: var(--white); font-weight: 500; }
+  .left-bottom { position: relative; z-index: 1; }
+  .left-testimonial { max-width: 320px; padding: 18px 20px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-lg); }
+  .left-testimonial blockquote { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.65; font-style: italic; }
+  .left-testimonial cite { display: block; font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 10px; font-style: normal; }
+  .left-testimonial cite strong { color: rgba(255,255,255,0.7); }
+  .right-panel { background: var(--white); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 48px 40px; min-height: 100vh; }
+  .auth-box { width: 100%; max-width: 400px; }
+  .auth-tabs { display: flex; margin-bottom: 32px; border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 4px; background: var(--gray-50); }
+  .auth-tab { flex: 1; padding: 9px 16px; border: none; border-radius: 7px; font-size: 14px; font-weight: 500; cursor: pointer; background: transparent; color: var(--gray-600); transition: all 0.18s; }
+  .auth-tab.active { background: var(--white); color: var(--black); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .auth-title { font-size: 24px; font-weight: 600; letter-spacing: -0.6px; margin-bottom: 6px; text-align: center; }
+  .auth-sub { font-size: 14px; color: var(--gray-600); text-align: center; margin-bottom: 28px; }
+  .social-btns { display: flex; gap: 8px; margin-bottom: 20px; }
+  .social-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 13px; font-weight: 500; background: transparent; color: var(--black); cursor: pointer; transition: all 0.15s; }
+  .social-btn:hover { background: var(--gray-50); border-color: var(--gray-400); }
+  .divider-text { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--gray-400); margin-bottom: 20px; }
+  .divider-text::before, .divider-text::after { content: ''; flex: 1; height: 1px; background: var(--gray-200); }
+  .form-group { margin-bottom: 14px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-800); margin-bottom: 6px; }
+  .form-input-wrap { position: relative; }
+  .form-input { width: 100%; padding: 10px 14px; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 14px; outline: none; font-family: var(--font); color: var(--black); background: var(--white); transition: border-color 0.15s, box-shadow 0.15s; }
+  .form-input:focus { border-color: var(--gray-600); box-shadow: 0 0 0 3px rgba(15,15,15,0.05); }
+  .form-input.error { border-color: var(--red); }
+  .form-input-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--gray-400); font-size: 16px; cursor: pointer; }
+  .form-error { font-size: 11px; color: var(--red); margin-top: 5px; display: none; }
+  .form-error.show { display: block; }
+  .pw-strength { margin-top: 8px; }
+  .pw-bars { display: flex; gap: 4px; margin-bottom: 4px; }
+  .pw-bar { flex: 1; height: 3px; border-radius: 2px; background: var(--gray-200); transition: background 0.2s; }
+  .pw-bar.weak { background: var(--red); }
+  .pw-bar.medium { background: #f59e0b; }
+  .pw-bar.strong { background: var(--green); }
+  .pw-label { font-size: 11px; color: var(--gray-400); }
+  .form-check { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; }
+  .form-check input[type="checkbox"] { width: 16px; height: 16px; margin-top: 2px; accent-color: var(--black); flex-shrink: 0; cursor: pointer; }
+  .form-check label { font-size: 13px; color: var(--gray-600); cursor: pointer; line-height: 1.5; }
+  .form-check label a { color: var(--black); font-weight: 500; }
+  .forgot-link { font-size: 12px; color: var(--gray-600); float: right; margin-top: -2px; margin-bottom: 14px; cursor: pointer; }
+  .forgot-link:hover { color: var(--black); }
+  .submit-btn { width: 100%; padding: 12px; background: var(--black); color: var(--white); border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px; }
+  .submit-btn:hover { background: var(--gray-800); }
+  .submit-btn:disabled { background: var(--gray-200); color: var(--gray-400); cursor: not-allowed; }
+  .submit-btn .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: var(--white); border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+  .submit-btn.loading .spinner { display: block; }
+  .submit-btn.loading .btn-text { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .auth-switch { font-size: 13px; color: var(--gray-600); text-align: center; }
+  .auth-switch a { color: var(--black); font-weight: 600; cursor: pointer; }
+  .step-indicator { display: flex; align-items: center; gap: 6px; margin-bottom: 28px; justify-content: center; }
+  .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gray-200); transition: all 0.2s; }
+  .step-dot.active { background: var(--black); width: 24px; border-radius: 4px; }
+  .step-dot.done { background: var(--green); }
+  .form-step { display: none; }
+  .form-step.active { display: block; animation: fadeSlide 0.2s ease; }
+  @keyframes fadeSlide { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+  .otp-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+  .otp-input { width: 48px; height: 52px; text-align: center; font-size: 22px; font-weight: 600; border: 1px solid var(--gray-200); border-radius: var(--radius-md); outline: none; transition: border-color 0.15s; }
+  .otp-input:focus { border-color: var(--black); box-shadow: 0 0 0 3px rgba(15,15,15,0.06); }
+  .success-screen { text-align: center; padding: 20px 0; }
+  .success-icon { width: 64px; height: 64px; border-radius: 50%; background: #f0fdf4; border: 1px solid #bbf7d0; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 20px; }
+  .success-title { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .success-desc { font-size: 14px; color: var(--gray-600); line-height: 1.6; margin-bottom: 28px; }
+  .back-btn { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--gray-600); background: none; border: none; cursor: pointer; margin-bottom: 24px; transition: color 0.15s; padding: 0; }
+  .back-btn:hover { color: var(--black); }
+  .auth-footer-note { margin-top: 32px; text-align: center; font-size: 12px; color: var(--gray-400); display: flex; align-items: center; justify-content: center; gap: 6px; }
+  @media (max-width: 800px) {
+    .auth-layout { grid-template-columns: 1fr; }
+    .left-panel { display: none; }
+    .right-panel { padding: 32px 24px; justify-content: flex-start; padding-top: 60px; }
+    .auth-box { max-width: 100%; }
+  }
+  .toast { position: fixed; bottom: 24px; right: 24px; z-index: 999; background: var(--black); color: var(--white); padding: 12px 20px; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; transform: translateY(80px); opacity: 0; transition: all 0.25s ease; display: flex; align-items: center; gap: 8px; pointer-events: none; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+<div class="auth-layout">
+  <div class="left-panel">
+    <div class="left-top">
+      <a href="untungin.html" class="left-logo"><div class="left-logo-dot"></div>Untungin</a>
+    </div>
+    <div class="left-main">
+      <div class="left-eyebrow">Platform UMKM Indonesia</div>
+      <h1 class="left-headline">Satu platform,<br><span>semua kebutuhan</span><br>bisnis kamu</h1>
+      <p class="left-desc">Bergabung dengan lebih dari 12.000 pelaku UMKM yang sudah mempercayakan manajemen bisnis mereka kepada Untungin.</p>
+      <div class="left-features">
+        <div class="left-feature"><div class="left-feature-icon">🚀</div><div class="left-feature-text"><strong>Mulai dalam 60 detik.</strong> Tidak perlu kartu kredit, langsung pakai.</div></div>
+        <div class="left-feature"><div class="left-feature-icon">🔒</div><div class="left-feature-text"><strong>Data aman & terenkripsi.</strong> Server di Indonesia, terdaftar OJK.</div></div>
+        <div class="left-feature"><div class="left-feature-icon">💳</div><div class="left-feature-text"><strong>Bayar pakai apa saja.</strong> QRIS, transfer, GoPay, OVO, dan lainnya.</div></div>
+        <div class="left-feature"><div class="left-feature-icon">📞</div><div class="left-feature-text"><strong>Dukungan 24/7.</strong> Tim support siap via WhatsApp kapanpun.</div></div>
+      </div>
+    </div>
+    <div class="left-bottom">
+      <div class="left-testimonial">
+        <blockquote>"Sejak pakai Untungin, laporan keuangan warung saya jadi otomatis. Hemat waktu dan tidak perlu akuntan lagi!"</blockquote>
+        <cite><strong>Ibu Sari, 42</strong> — Pemilik Warung Makan Sederhana, Bandung</cite>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="auth-box">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="showTab('login')">Masuk</button>
+        <button class="auth-tab" id="tabRegister" onclick="showTab('register')">Daftar gratis</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="loginSection">
+        <div class="auth-title">Selamat datang kembali</div>
+        <div class="auth-sub">Masuk ke dashboard bisnis kamu</div>
+        <div class="social-btns">
+          <button class="social-btn" onclick="handleSocial('Google')"><span>🔵</span> Google</button>
+          <button class="social-btn" onclick="handleSocial('Facebook')"><span>🟦</span> Facebook</button>
+        </div>
+        <div class="divider-text">atau masuk dengan email</div>
+        <div id="loginView">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <div class="form-input-wrap">
+              <input type="email" class="form-input" id="loginEmail" placeholder="nama@bisnis.com" oninput="validateEmail('loginEmail','loginEmailErr')">
+            </div>
+            <div class="form-error" id="loginEmailErr">Email tidak valid</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Kata sandi</label>
+            <div class="form-input-wrap">
+              <input type="password" class="form-input" id="loginPw" placeholder="Minimal 8 karakter">
+              <span class="form-input-icon" onclick="togglePw('loginPw', this)">👁️</span>
+            </div>
+          </div>
+          <a class="forgot-link" onclick="showForgot()">Lupa kata sandi?</a>
+          <div style="clear:both;margin-bottom:4px"></div>
+          <div class="form-check">
+            <input type="checkbox" id="rememberMe">
+            <label for="rememberMe">Ingat saya di perangkat ini</label>
+          </div>
+          <button class="submit-btn" id="loginBtn" onclick="handleLogin()">
+            <div class="spinner"></div><span class="btn-text">Masuk ke akun →</span>
+          </button>
+          <div class="auth-switch">Belum punya akun? <a onclick="showTab('register')">Daftar gratis</a></div>
+        </div>
+        <div id="forgotView" style="display:none">
+          <button class="back-btn" onclick="showLoginView()">← Kembali</button>
+          <div class="auth-title" style="font-size:20px">Reset kata sandi</div>
+          <div class="auth-sub" style="font-size:13px;margin-bottom:20px">Masukkan email kamu. Kami kirim link reset.</div>
+          <div class="form-group">
+            <label class="form-label">Email terdaftar</label>
+            <input type="email" class="form-input" id="forgotEmail" placeholder="nama@bisnis.com">
+          </div>
+          <button class="submit-btn" onclick="handleForgot()">
+            <div class="spinner"></div><span class="btn-text">Kirim link reset →</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="registerSection" style="display:none">
+        <div class="step-indicator">
+          <div class="step-dot active" id="step1dot"></div>
+          <div class="step-dot" id="step2dot"></div>
+          <div class="step-dot" id="step3dot"></div>
+        </div>
+
+        <!-- STEP 1 -->
+        <div class="form-step active" id="step1">
+          <div class="auth-title">Buat akun baru</div>
+          <div class="auth-sub">Langkah 1 dari 3 — Info akun</div>
+          <div class="social-btns">
+            <button class="social-btn" onclick="handleSocial('Google')"><span>🔵</span> Lanjut dengan Google</button>
+          </div>
+          <div class="divider-text">atau daftar dengan email</div>
+          <div class="form-row">
+            <div>
+              <label class="form-label">Nama depan</label>
+              <input type="text" class="form-input" id="regFirstName" placeholder="Budi">
+            </div>
+            <div>
+              <label class="form-label">Nama belakang</label>
+              <input type="text" class="form-input" id="regLastName" placeholder="Santoso">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email bisnis</label>
+            <div class="form-input-wrap">
+              <input type="email" class="form-input" id="regEmail" placeholder="nama@bisnis.com" oninput="validateEmail('regEmail','regEmailErr')">
+            </div>
+            <div class="form-error" id="regEmailErr">Format email tidak valid</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Kata sandi</label>
+            <div class="form-input-wrap">
+              <input type="password" class="form-input" id="regPw" placeholder="Buat kata sandi kuat" oninput="checkStrength(this.value)">
+              <span class="form-input-icon" onclick="togglePw('regPw', this)">👁️</span>
+            </div>
+            <div class="pw-strength">
+              <div class="pw-bars">
+                <div class="pw-bar" id="pwBar1"></div><div class="pw-bar" id="pwBar2"></div>
+                <div class="pw-bar" id="pwBar3"></div><div class="pw-bar" id="pwBar4"></div>
+              </div>
+              <div class="pw-label" id="pwLabel">Masukkan kata sandi</div>
+            </div>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="agreeTerms">
+            <label for="agreeTerms">Saya setuju dengan <a href="#">Syarat & Ketentuan</a> dan <a href="#">Kebijakan Privasi</a> Untungin</label>
+          </div>
+          <button class="submit-btn" onclick="goStep2()">
+            <div class="spinner"></div><span class="btn-text">Lanjut →</span>
+          </button>
+          <div class="auth-switch">Sudah punya akun? <a onclick="showTab('login')">Masuk</a></div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="form-step" id="step2">
+          <button class="back-btn" onclick="goStep(1)">← Kembali</button>
+          <div class="auth-title">Profil bisnis kamu</div>
+          <div class="auth-sub">Langkah 2 dari 3 — Info bisnis</div>
+          <div class="form-group">
+            <label class="form-label">Nama bisnis</label>
+            <input type="text" class="form-input" id="bizName" placeholder="Contoh: Toko Maju Jaya">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jenis usaha</label>
+            <select class="form-input" id="bizType">
+              <option value="">Pilih jenis usaha...</option>
+              <option>Warung / Toko Kelontong</option>
+              <option>Restoran / Kafe / FnB</option>
+              <option>Toko Retail / Fashion</option>
+              <option>Jasa / Freelance</option>
+              <option>Manufaktur / Produksi</option>
+              <option>Perdagangan / Distributor</option>
+              <option>Lainnya</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nomor HP / WhatsApp</label>
+            <div class="form-input-wrap">
+              <input type="tel" class="form-input" id="regPhone" placeholder="08xxxxxxxxxx" style="padding-left:48px">
+              <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--gray-600)">🇮🇩</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jumlah karyawan</label>
+            <select class="form-input" id="employees">
+              <option value="">Pilih jumlah karyawan...</option>
+              <option>Hanya saya</option>
+              <option>2 – 5 orang</option>
+              <option>6 – 20 orang</option>
+              <option>21 – 50 orang</option>
+              <option>Lebih dari 50 orang</option>
+            </select>
+          </div>
+          <button class="submit-btn" onclick="goStep3()">
+            <div class="spinner"></div><span class="btn-text">Lanjut →</span>
+          </button>
+        </div>
+
+        <!-- STEP 3 - OTP (skip, langsung register) -->
+        <div class="form-step" id="step3">
+          <button class="back-btn" onclick="goStep(2)">← Kembali</button>
+          <div class="auth-title">Verifikasi nomor HP</div>
+          <div class="auth-sub" id="otpSubtitle">Kami kirim kode 6 digit ke <strong>08xxxxxxxxxx</strong></div>
+          <div class="otp-group" id="otpGroup"></div>
+          <div style="text-align:center;margin-bottom:20px">
+            <span style="font-size:13px;color:var(--gray-600)">Tidak menerima kode? </span>
+            <a style="font-size:13px;color:var(--black);font-weight:600;cursor:pointer" onclick="resendOtp()">Kirim ulang</a>
+            <span style="font-size:12px;color:var(--gray-400);margin-left:4px" id="otpTimer"></span>
+          </div>
+          <button class="submit-btn" id="verifyBtn" onclick="verifyOtp()">
+            <div class="spinner"></div><span class="btn-text">Verifikasi & selesai →</span>
+          </button>
+        </div>
+
+        <!-- SUCCESS -->
+        <div class="form-step" id="stepSuccess">
+          <div class="success-screen">
+            <div class="success-icon">🎉</div>
+            <div class="success-title">Akun berhasil dibuat!</div>
+            <div class="success-desc">Selamat datang di Untungin. Akun bisnis kamu sudah aktif dan siap digunakan.<br><br>Cek email untuk konfirmasi dan panduan memulai.</div>
+            <button class="submit-btn" onclick="goToHome()">Mulai jelajahi aplikasi →</button>
+            <div style="font-size:12px;color:var(--gray-400);margin-top:12px">Kamu akan diarahkan ke halaman utama</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-footer-note">🔒 Koneksi aman SSL · Terdaftar OJK · Data tersimpan di Indonesia</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✅ <span id="toastMsg"></span></div>
+
+<script>
+// ── CONFIG ──
+const API_BASE = 'https://untungin-backend.vercel.app';
+
+// ── TAB ──
+function showTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('tabLogin').classList.toggle('active', isLogin);
+  document.getElementById('tabRegister').classList.toggle('active', !isLogin);
+  document.getElementById('loginSection').style.display = isLogin ? '' : 'none';
+  document.getElementById('registerSection').style.display = isLogin ? 'none' : '';
+}
+
+// ── LOGIN ──
+function showLoginView() {
+  document.getElementById('loginView').style.display = '';
+  document.getElementById('forgotView').style.display = 'none';
+}
+function showForgot() {
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('forgotView').style.display = '';
+}
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pw    = document.getElementById('loginPw').value;
+  if (!email || !isValidEmail(email)) {
+    document.getElementById('loginEmail').classList.add('error');
+    document.getElementById('loginEmailErr').classList.add('show');
+    return;
+  }
+  if (pw.length < 8) { showToast('Kata sandi minimal 8 karakter'); return; }
+  setLoading('loginBtn', true);
+  try {
+    const res  = await fetch(API_BASE + '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pw }),
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast('❌ ' + (data.error || 'Login gagal')); return; }
+    localStorage.setItem('untungin_token', data.token);
+    localStorage.setItem('untungin_user', JSON.stringify(data.user));
+    showToast('✅ Selamat datang, ' + data.user.name + '!');
+    setTimeout(() => window.location.href = 'untungin.html', 1200);
+  } catch (err) {
+    showToast('❌ Tidak dapat terhubung ke server.');
+  } finally {
+    setLoading('loginBtn', false);
+  }
+}
+function handleForgot() {
+  const email = document.getElementById('forgotEmail').value.trim();
+  if (!isValidEmail(email)) { showToast('Masukkan email yang valid'); return; }
+  showToast('📧 Link reset dikirim ke ' + email);
+  setTimeout(showLoginView, 2000);
+}
+function handleSocial(p) { showToast('Menghubungkan ke ' + p + '...'); }
+
+// ── REGISTER STEPS ──
+let currentStep = 1;
+function goStep(n) {
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+  [1,2,3].forEach(i => {
+    const d = document.getElementById('step' + i + 'dot');
+    if (!d) return;
+    d.classList.remove('active','done');
+    if (i < n) d.classList.add('done');
+    if (i === n) d.classList.add('active');
+  });
+  currentStep = n;
+}
+function goStep2() {
+  const email = document.getElementById('regEmail').value.trim();
+  const pw    = document.getElementById('regPw').value;
+  if (!document.getElementById('regFirstName').value.trim()) { showToast('Masukkan nama depan kamu'); return; }
+  if (!isValidEmail(email)) { showToast('Masukkan email yang valid'); return; }
+  if (pw.length < 8) { showToast('Kata sandi minimal 8 karakter'); return; }
+  if (!document.getElementById('agreeTerms').checked) { showToast('Kamu harus menyetujui syarat & ketentuan'); return; }
+  goStep(2);
+}
+function goStep3() {
+  const biz   = document.getElementById('bizName').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  const type  = document.getElementById('bizType').value;
+  if (!biz)  { showToast('Masukkan nama bisnis kamu'); return; }
+  if (!type) { showToast('Pilih jenis usaha'); return; }
+  if (!phone){ showToast('Masukkan nomor HP kamu'); return; }
+  document.getElementById('otpSubtitle').innerHTML = 'Kami kirim kode 6 digit ke <strong>' + phone + '</strong>';
+  buildOtp();
+  goStep(3);
+  startOtpTimer();
+}
+
+// ── OTP ──
+function buildOtp() {
+  const g = document.getElementById('otpGroup');
+  g.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    const inp = document.createElement('input');
+    inp.type = 'text'; inp.maxLength = 1; inp.className = 'otp-input';
+    inp.inputMode = 'numeric'; inp.pattern = '[0-9]*';
+    inp.addEventListener('input', e => { if (e.target.value && e.target.nextElementSibling) e.target.nextElementSibling.focus(); });
+    inp.addEventListener('keydown', e => { if (e.key === 'Backspace' && !e.target.value && e.target.previousElementSibling) e.target.previousElementSibling.focus(); });
+    g.appendChild(inp);
+  }
+}
+let otpTimerID;
+function startOtpTimer() {
+  clearInterval(otpTimerID);
+  let sec = 60;
+  const lbl = document.getElementById('otpTimer');
+  const update = () => { lbl.textContent = sec > 0 ? '(' + sec + 's)' : ''; if (sec-- <= 0) clearInterval(otpTimerID); };
+  update();
+  otpTimerID = setInterval(update, 1000);
+}
+function resendOtp() { showToast('Kode baru dikirim!'); buildOtp(); startOtpTimer(); }
+
+// ── VERIFY OTP → REGISTER KE BACKEND ──
+async function verifyOtp() {
+  const inputs = document.querySelectorAll('.otp-input');
+  const code   = [...inputs].map(i => i.value).join('');
+  if (code.length < 6) { showToast('Masukkan 6 digit kode OTP'); return; }
+
+  setLoading('verifyBtn', true);
+
+  const name         = (document.getElementById('regFirstName').value + ' ' + document.getElementById('regLastName').value).trim();
+  const email        = document.getElementById('regEmail').value.trim();
+  const password     = document.getElementById('regPw').value;
+  const businessName = document.getElementById('bizName').value.trim();
+  const phone        = document.getElementById('regPhone').value.trim();
+
+  try {
+    const res  = await fetch(API_BASE + '/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password, businessName, phone }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      showToast('❌ ' + (data.error || 'Registrasi gagal'));
+      setLoading('verifyBtn', false);
+      return;
+    }
+
+    localStorage.setItem('untungin_token', data.token);
+    localStorage.setItem('untungin_user', JSON.stringify(data.user));
+
+    clearInterval(otpTimerID);
+    document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('stepSuccess').classList.add('active');
+    [1,2,3].forEach(i => { const d = document.getElementById('step' + i + 'dot'); if (d) d.classList.add('done'); });
+
+  } catch (err) {
+    showToast('❌ Tidak dapat terhubung ke server.');
+  } finally {
+    setLoading('verifyBtn', false);
+  }
+}
+
+function goToHome() { window.location.href = 'untungin.html'; }
+
+// ── HELPERS ──
+function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function validateEmail(inputId, errId) {
+  const v = document.getElementById(inputId).value;
+  const ok = !v || isValidEmail(v);
+  document.getElementById(inputId).classList.toggle('error', !ok && v);
+  document.getElementById(errId).classList.toggle('show', !ok && !!v);
+}
+function togglePw(id, icon) {
+  const inp = document.getElementById(id);
+  if (inp.type === 'password') { inp.type = 'text'; icon.textContent = '🙈'; }
+  else { inp.type = 'password'; icon.textContent = '👁️'; }
+}
+function checkStrength(pw) {
+  const bars = [1,2,3,4].map(i => document.getElementById('pwBar' + i));
+  const label = document.getElementById('pwLabel');
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const cls   = ['','weak','weak','medium','strong'];
+  const texts = ['Masukkan kata sandi','Lemah','Cukup','Kuat','Sangat kuat'];
+  bars.forEach((b, i) => { b.className = 'pw-bar' + (i < score ? ' ' + cls[score] : ''); });
+  label.textContent = texts[score];
+  label.style.color = score <= 1 ? 'var(--red)' : score === 2 ? '#f59e0b' : score >= 3 ? 'var(--green)' : 'var(--gray-400)';
+}
+function setLoading(id, on) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.classList.toggle('loading', on);
+  btn.disabled = on;
+}
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+}
+</script>
+</body>
+</html>

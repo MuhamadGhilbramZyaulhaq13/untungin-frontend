@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Untungin — Riwayat Transaksi</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #0f0f0f; --white: #ffffff;
+    --gray-50: #f8f8f7; --gray-100: #f0f0ee; --gray-200: #e2e2df;
+    --gray-400: #a8a8a4; --gray-600: #6b6b67; --gray-800: #2c2c2a;
+    --green: #16a34a; --red: #dc2626; --amber: #d97706;
+    --radius-md: 10px; --radius-lg: 14px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  body { font-family: var(--font); background: var(--gray-50); color: var(--black); min-height: 100vh; }
+
+  .nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 60px; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--gray-200); }
+  .nav-logo { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 6px; text-decoration: none; color: var(--black); }
+  .nav-logo-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--black); }
+  .btn { border: none; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; cursor: pointer; padding: 7px 16px; font-family: var(--font); }
+  .btn-ghost { background: transparent; border: 1px solid var(--gray-200); color: var(--black); }
+  .btn-ghost:hover { background: var(--gray-50); }
+
+  .page { max-width: 860px; margin: 0 auto; padding: 40px 20px; }
+  .page-header { margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .page-title { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
+  .page-sub { font-size: 13px; color: var(--gray-600); margin-top: 3px; }
+
+  /* Stats */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 16px 20px; }
+  .stat-num { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
+  .stat-lbl { font-size: 12px; color: var(--gray-600); margin-top: 3px; }
+
+  /* Order cards */
+  .orders-list { display: flex; flex-direction: column; gap: 12px; }
+  .order-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden; transition: border-color 0.15s; }
+  .order-card:hover { border-color: var(--gray-400); }
+  .order-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--gray-100); flex-wrap: wrap; gap: 8px; }
+  .order-id { font-size: 13px; font-weight: 600; color: var(--black); font-family: monospace; }
+  .order-date { font-size: 12px; color: var(--gray-400); }
+  .order-status { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+  .status-paid { background: #f0fdf4; color: var(--green); border: 1px solid #bbf7d0; }
+  .status-pending { background: #fffbeb; color: var(--amber); border: 1px solid #fde68a; }
+  .status-cancelled { background: var(--gray-50); color: var(--gray-400); border: 1px solid var(--gray-200); }
+
+  .order-items { padding: 14px 20px; display: flex; flex-direction: column; gap: 10px; }
+  .order-item { display: flex; align-items: center; gap: 12px; }
+  .order-item-img { width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--gray-100); border: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; overflow: hidden; }
+  .order-item-img img { width: 100%; height: 100%; object-fit: cover; }
+  .order-item-name { font-size: 13px; font-weight: 500; }
+  .order-item-cat { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+  .order-item-price { margin-left: auto; font-size: 13px; font-weight: 600; }
+
+  .order-footer { padding: 12px 20px; background: var(--gray-50); border-top: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .order-total { font-size: 14px; font-weight: 600; }
+  .order-total span { color: var(--gray-600); font-weight: 400; margin-right: 4px; }
+  .order-actions { display: flex; gap: 8px; }
+
+  /* License box */
+  .license-box { margin: 0 20px 16px; padding: 12px 16px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .license-key { font-family: monospace; font-size: 13px; font-weight: 700; color: var(--black); letter-spacing: 1px; }
+  .license-copy { font-size: 11px; color: var(--green); cursor: pointer; font-weight: 600; flex-shrink: 0; }
+  .license-copy:hover { text-decoration: underline; }
+  .download-link { margin: 0 20px 16px; display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 13px; text-decoration: none; color: var(--black); font-weight: 500; transition: border-color 0.15s; }
+  .download-link:hover { border-color: var(--black); }
+
+  /* Empty */
+  .empty { text-align: center; padding: 60px 20px; color: var(--gray-400); }
+  .empty-icon { font-size: 48px; margin-bottom: 14px; }
+  .empty-title { font-size: 16px; font-weight: 500; color: var(--gray-600); margin-bottom: 6px; }
+  .empty-sub { font-size: 13px; margin-bottom: 20px; }
+
+  /* Skeleton */
+  .skeleton { background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-50) 50%, var(--gray-100) 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: var(--radius-md); }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; z-index: 999; background: var(--black); color: var(--white); padding: 11px 18px; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; transform: translateY(80px); opacity: 0; transition: all 0.25s; pointer-events: none; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 600px) {
+    .nav { padding: 0 20px; }
+    .page { padding: 24px 16px; }
+    .stats { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="untungin.html" class="nav-logo"><div class="nav-logo-dot"></div>Untungin</a>
+  <div style="display:flex;gap:8px">
+    <a href="dashboard.html" class="btn btn-ghost">← Kembali</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Riwayat Transaksi</div>
+      <div class="page-sub">Semua pembelian aplikasi yang pernah kamu lakukan</div>
+    </div>
+    <a href="untungin.html" style="padding:8px 18px;background:var(--black);color:var(--white);border-radius:var(--radius-md);font-size:13px;font-weight:600;text-decoration:none">+ Beli lagi</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num" id="statTotal">—</div>
+      <div class="stat-lbl">Total transaksi</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="statPaid">—</div>
+      <div class="stat-lbl">Berhasil dibayar</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="statSpent">—</div>
+      <div class="stat-lbl">Total pengeluaran</div>
+    </div>
+  </div>
+
+  <!-- Orders List -->
+  <div class="orders-list" id="ordersList">
+    <!-- Skeleton loading -->
+    <div class="order-card">
+      <div class="order-header">
+        <div class="skeleton" style="width:160px;height:16px"></div>
+        <div class="skeleton" style="width:80px;height:22px;border-radius:20px"></div>
+      </div>
+      <div class="order-items">
+        <div class="order-item">
+          <div class="skeleton" style="width:40px;height:40px;border-radius:8px"></div>
+          <div style="flex:1"><div class="skeleton" style="width:140px;height:14px;margin-bottom:6px"></div><div class="skeleton" style="width:80px;height:11px"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+const API_BASE = 'https://untungin-backend.vercel.app';
+const token    = localStorage.getItem('untungin_token');
+if (!token) window.location.href = 'auth.html';
+
+const catIcon = {
+  'Kasir & POS': '🖥️', 'Pembukuan': '📒', 'Inventory': '📦',
+  'Payroll': '👥', 'Invoice': '🧾', 'Laporan': '📊', 'Lainnya': '📱',
+};
+
+function formatRp(n) { return 'Rp ' + Number(n).toLocaleString('id-ID'); }
+function formatDate(d) {
+  return new Date(d).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+async function loadOrders() {
+  try {
+    const res  = await fetch(API_BASE + '/api/orders', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast('❌ Gagal memuat transaksi'); return; }
+
+    const orders = data.orders || [];
+    updateStats(orders);
+    renderOrders(orders);
+  } catch (err) {
+    showToast('❌ Tidak dapat terhubung ke server');
+    document.getElementById('ordersList').innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">⚠️</div>
+        <div class="empty-title">Gagal memuat transaksi</div>
+        <div class="empty-sub">Periksa koneksi internet kamu</div>
+        <button onclick="loadOrders()" style="padding:8px 18px;border:1px solid var(--gray-200);border-radius:8px;cursor:pointer;font-size:13px">Coba lagi</button>
+      </div>`;
+  }
+}
+
+function updateStats(orders) {
+  const paid  = orders.filter(o => o.status === 'paid');
+  const spent = paid.reduce((s, o) => s + (o.total || 0), 0);
+  document.getElementById('statTotal').textContent = orders.length;
+  document.getElementById('statPaid').textContent  = paid.length;
+  document.getElementById('statSpent').textContent = spent ? formatRp(spent) : 'Rp 0';
+}
+
+function renderOrders(orders) {
+  const list = document.getElementById('ordersList');
+  if (!orders.length) {
+    list.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">🧾</div>
+        <div class="empty-title">Belum ada transaksi</div>
+        <div class="empty-sub">Mulai belanja aplikasi untuk bisnis kamu!</div>
+        <a href="untungin.html" style="display:inline-block;padding:9px 20px;background:var(--black);color:var(--white);border-radius:var(--radius-md);font-size:13px;font-weight:600;text-decoration:none">Jelajahi aplikasi →</a>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = orders.map(o => {
+    const statusClass = o.status === 'paid' ? 'status-paid' : o.status === 'pending' ? 'status-pending' : 'status-cancelled';
+    const statusLabel = o.status === 'paid' ? '✅ Lunas' : o.status === 'pending' ? '⏳ Menunggu' : '❌ Dibatalkan';
+
+    const itemsHtml = (o.items || []).map(item => `
+      <div class="order-item">
+        <div class="order-item-img">
+          ${item.imageUrl ? `<img src="${item.imageUrl}" onerror="this.parentElement.textContent='📦'">` : (catIcon[item.category] || '📦')}
+        </div>
+        <div>
+          <div class="order-item-name">${item.name}</div>
+          <div class="order-item-cat">${item.category || 'Aplikasi'} · 1 bulan</div>
+        </div>
+        <div class="order-item-price">${formatRp(item.price)}</div>
+      </div>
+    `).join('');
+
+    const licenseHtml = o.status === 'paid' && o.licenseKey ? `
+      <div class="license-box">
+        <div>
+          <div style="font-size:11px;color:var(--green);font-weight:500;margin-bottom:3px">🔑 License Key</div>
+          <div class="license-key">${o.licenseKey}</div>
+        </div>
+        <span class="license-copy" onclick="copyText('${o.licenseKey}', 'License key disalin!')">Salin</span>
+      </div>
+      <a href="${o.downloadUrl || '#'}" target="_blank" class="download-link">
+        ⬇️ <span>Klik untuk download aplikasi</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--gray-400)">→</span>
+      </a>
+    ` : '';
+
+    return `
+      <div class="order-card">
+        <div class="order-header">
+          <div>
+            <div class="order-id">${o.orderId}</div>
+            <div class="order-date">${formatDate(o.createdAt)}</div>
+          </div>
+          <span class="order-status ${statusClass}">${statusLabel}</span>
+        </div>
+        <div class="order-items">${itemsHtml}</div>
+        ${licenseHtml}
+        <div class="order-footer">
+          <div class="order-total">
+            <span>Total:</span>${formatRp(o.total)}
+            <span style="font-size:11px;color:var(--gray-400);margin-left:8px">(termasuk diskon & pajak)</span>
+          </div>
+          <div class="order-actions">
+            ${o.status === 'pending' ? `<button class="btn btn-ghost" style="font-size:12px;padding:5px 12px" onclick="cancelOrder('${o.orderId}')">Batalkan</button>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function cancelOrder(orderId) {
+  if (!confirm('Batalkan order ini?')) return;
+  try {
+    const res  = await fetch(API_BASE + '/api/orders/' + orderId, {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body:    JSON.stringify({ status: 'cancelled' }),
+    });
+    if (res.ok) { showToast('✅ Order dibatalkan'); loadOrders(); }
+    else { showToast('❌ Gagal membatalkan order'); }
+  } catch { showToast('❌ Tidak dapat terhubung ke server'); }
+}
+
+function copyText(text, msg) {
+  navigator.clipboard.writeText(text).then(() => showToast('✅ ' + msg));
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+loadOrders();
+</script>
+</body>
+</html>
