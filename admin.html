@@ -579,7 +579,7 @@ async function deleteProduct(id, name) {
 // ── LOAD USERS ──
 async function loadUsers() {
   try {
-    const res  = await fetch(API_BASE + '/api/admin/stats?type=users', { headers: { 'Authorization': 'Bearer ' + token } });
+    const res  = await fetch(API_BASE + '/api/admin?type=users', { headers: { 'Authorization': 'Bearer ' + token } });
     const data = await res.json();
     if (!res.ok) { showToast('❌ Gagal memuat users'); return; }
     allUsers = data.users || [];
@@ -640,7 +640,7 @@ function filterUsers(q) {
 // ── LOAD ALL ORDERS ──
 async function loadAllOrders() {
   try {
-    const res  = await fetch(API_BASE + '/api/admin/stats?type=orders', { headers: { 'Authorization': 'Bearer ' + token } });
+    const res  = await fetch(API_BASE + '/api/admin?type=orders', { headers: { 'Authorization': 'Bearer ' + token } });
     const data = await res.json();
     if (!res.ok) { showToast('❌ Gagal memuat orders'); return; }
     allOrders = data.orders || [];
@@ -703,7 +703,7 @@ function filterOrdersByStatus(status) {
 
 async function updateOrderStatus(orderId, status, selectEl) {
   try {
-    const res = await fetch(API_BASE + '/api/admin/orders', {
+    const res = await fetch(API_BASE + '/api/admin', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ orderId, status }),
@@ -718,7 +718,7 @@ async function updateOrderStatus(orderId, status, selectEl) {
 let currentPeriod = 'weekly';
 async function loadReports() {
   try {
-    const res  = await fetch(API_BASE + '/api/admin/stats?type=summary', { headers: { 'Authorization': 'Bearer ' + token } });
+    const res  = await fetch(API_BASE + '/api/admin?type=summary', { headers: { 'Authorization': 'Bearer ' + token } });
     const data = await res.json();
     if (!res.ok) { showToast('❌ Gagal memuat laporan'); return; }
     chartData = data;
