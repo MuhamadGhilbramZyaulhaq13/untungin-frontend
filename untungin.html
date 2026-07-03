@@ -1011,12 +1011,12 @@
         <div class="dl-section-title">Unduh aplikasi yang dibeli</div>
         <div class="dl-link-box">
           <div class="dl-link-icon">📦</div>
-          <div class="dl-link-text">Klik link berikut untuk mendownload aplikasi yang telah kamu beli:</div>
-          <a href="https://edlink.id/panel/classes/1657913/sections/24919383/7823346"
+          <div class="dl-link-text">link berikut untuk mengunduh aplikasi:</div>
+          <a href="https://github.com/MuhamadGhilbramZyaulhaq13/KasirkuPro/releases/download/app/KasirKuPro-1.0.msi"
              target="_blank"
              class="dl-link-anchor"
              onclick="showToast('Membuka link download... 🚀')">
-            https://edlink.id/panel/classes/1657913/<wbr>sections/24919383/7823346
+            https://github.com/MuhamadGhilbramZyaulhaq13/KasirkuPro/releases/download/app/KasirKuPro-1.0.msi
           </a>
           <div class="dl-link-meta">
             🔒 Link aktif selama 30 hari &nbsp;·&nbsp; 📋 Salin link
@@ -1493,7 +1493,7 @@ function copyLicense() {
 }
 
 function copyDownloadLink() {
-  const url = 'https://edlink.id/panel/classes/1657913/sections/24919383/7823346';
+  const url = 'https://github.com/MuhamadGhilbramZyaulhaq13/KasirkuPro/releases/download/app/KasirKuPro-1.0.msi';
   navigator.clipboard.writeText(url).then(() => showToast('✅ Link download disalin!'));
 }
 
@@ -1576,7 +1576,6 @@ function handleLogout() {
   setTimeout(() => window.location.href = 'auth.html', 1500);
 }
 
-// Jalankan cek auth saat halaman dimuat
 initAuth();
 
 loadProductsFromAPI();

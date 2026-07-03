@@ -1,41 +1,20 @@
-/**
- * ═══════════════════════════════════════════════════════
- *   UNTUNGIN — Midtrans Payment Gateway Integration
- *   File: payment-integration.js
- *
- *   Cara pakai:
- *   1. Tambahkan Snap.js di <head> untungin.html:
- *      <script src="https://app.sandbox.midtrans.com/snap/snap.js"
- *              data-client-key="YOUR_CLIENT_KEY"></script>
- *
- *   2. Tambahkan <script src="payment-integration.js"></script>
- *      sebelum </body>
- *
- *   3. Ganti BASE_URL dengan URL backend kamu
- * ═══════════════════════════════════════════════════════
- */
+
 
 const UntunginPayment = (() => {
 
   // ── KONFIGURASI ──────────────────────────────────────
   const CONFIG = {
-    // Ganti dengan URL backend/API kamu
     // Contoh: 'https://api.untungin.id' atau 'http://localhost:3000'
     BASE_URL: 'http://localhost:3000',
 
-    // Endpoint backend untuk buat transaksi
     CREATE_PAYMENT_ENDPOINT: '/api/create-payment',
 
-    // Endpoint backend untuk cek status
     CHECK_STATUS_ENDPOINT: '/api/payment-status',
 
-    // URL redirect setelah sukses
     SUCCESS_URL: '/sukses.html',
 
-    // Diskon UMKM (10%)
     UMKM_DISCOUNT_RATE: 0.10,
 
-    // PPN 11%
     TAX_RATE: 0.11,
   };
 
