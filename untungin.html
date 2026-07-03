@@ -1012,11 +1012,11 @@
         <div class="dl-link-box">
           <div class="dl-link-icon">📦</div>
           <div class="dl-link-text">Klik link berikut untuk mendownload aplikasi yang telah kamu beli:</div>
-          <a href="https://github.com/MuhamadGhilbramZyaulhaq13/KasirkuPro/releases/download/app/KasirKuPro-1.0.msi"
+          <a href="https://edlink.id/panel/classes/1657913/sections/24919383/7823346"
              target="_blank"
              class="dl-link-anchor"
              onclick="showToast('Membuka link download... 🚀')">
-            https://github.com/MuhamadGhilbramZyaulhaq13/KasirkuPro/releases/download/app/KasirKuPro-1.0.msi
+            https://edlink.id/panel/classes/1657913/<wbr>sections/24919383/7823346
           </a>
           <div class="dl-link-meta">
             🔒 Link aktif selama 30 hari &nbsp;·&nbsp; 📋 Salin link
@@ -1325,7 +1325,6 @@ function drawQR(svgEl, text) {
 async function openQrisModal() {
   if (!cart.length) { showToast('Keranjang masih kosong!'); return; }
 
-  // Cek login dulu
   const token = localStorage.getItem('untungin_token');
   if (!token) {
     showToast('⚠️ Silakan login terlebih dahulu');
@@ -1333,17 +1332,17 @@ async function openQrisModal() {
     return;
   }
 
-  qrisSimulated = false;
+  // Tampilkan overlay loading dulu
+  document.querySelectorAll('.qris-screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('qrisScreen1').classList.add('active');
+  document.getElementById('qrisOverlay').classList.add('active');
+  document.getElementById('qrisAmount').textContent  = 'Memuat...';
+  document.getElementById('qrisOrderId').textContent = 'Membuat QRIS...';
+  document.getElementById('qrisCode').innerHTML = '<text x="100" y="105" text-anchor="middle" font-size="14" fill="#999">Memuat QR...</text>';
 
-  // Hitung total
-  const sub   = cart.reduce((a,p) => a + p.price, 0);
-  const disc  = Math.round(sub * 0.10);
-  const ppn   = Math.round((sub - disc) * 0.11);
-  const total = sub - disc + ppn;
-
-  // Buat order di database
   try {
-    const res  = await fetch(API_BASE + '/api/orders', {
+    // Request QRIS ke Midtrans via backend
+    const res  = await fetch(API_BASE + '/api/payment/create', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({
@@ -1355,45 +1354,49 @@ async function openQrisModal() {
           price:    p.price,
           quantity: 1,
         })),
-        paymentMethod: selectedPay,
       }),
     });
     const data = await res.json();
-    if (!res.ok) { showToast('❌ ' + (data.error || 'Gagal membuat order')); return; }
 
-    // Simpan order data
-    qrisOrderId      = data.orderId;
+    if (!res.ok) {
+      closeQris();
+      showToast('❌ ' + (data.error || 'Gagal membuat QRIS'));
+      return;
+    }
+
+    // Simpan data order
+    qrisOrderId       = data.orderId;
     window._orderData = data;
 
+    // Update UI
+    document.getElementById('qrisAmount').textContent  = formatRp(data.total);
+    document.getElementById('qrisOrderId').textContent = 'Order: ' + data.orderId;
+
+    // Tampilkan QR image dari Midtrans
+    const qrisSvg = document.getElementById('qrisCode');
+    if (data.qrisUrl) {
+      // Ganti SVG dengan img tag QR dari Midtrans
+      qrisSvg.outerHTML = `<img id="qrisCode" src="${data.qrisUrl}" alt="QRIS Code" style="width:200px;height:200px;display:block;margin:0 auto;border-radius:8px">`;
+    } else {
+      // Fallback ke generated QR
+      drawQR(document.getElementById('qrisCode'), data.orderId);
+    }
+
+    // Reset check button
+    const btn = document.getElementById('qrisCheckBtn');
+    btn.classList.remove('checking');
+    btn.querySelector('.check-lbl').textContent = '🔍 Cek status pembayaran';
+
+    // Hitung sisa waktu dari expiry Midtrans
+    const expiryMs = data.qrisExpiry
+      ? Math.max(0, Math.floor((new Date(data.qrisExpiry) - Date.now()) / 1000))
+      : 15 * 60;
+    startQrisTimer(expiryMs);
+
   } catch (err) {
+    closeQris();
     showToast('❌ Tidak dapat terhubung ke server');
-    return;
   }
-
-  // Update modal info
-  const sub2  = cart.reduce((a,p) => a + p.price, 0);
-  const disc2 = Math.round(sub2 * 0.10);
-  const ppn2  = Math.round((sub2 - disc2) * 0.11);
-  const tot2  = sub2 - disc2 + ppn2;
-
-  document.getElementById('qrisAmount').textContent  = formatRp(tot2);
-  document.getElementById('qrisOrderId').textContent = 'Order: ' + qrisOrderId;
-
-  // Draw QR
-  drawQR(document.getElementById('qrisCode'), qrisOrderId + tot2);
-
-  // Show screen 1
-  document.querySelectorAll('.qris-screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('qrisScreen1').classList.add('active');
-  document.getElementById('qrisOverlay').classList.add('active');
-
-  // Reset check button
-  const btn = document.getElementById('qrisCheckBtn');
-  btn.classList.remove('checking');
-  btn.querySelector('.check-lbl').textContent = '🔍 Cek status pembayaran';
-
-  // Start 15-min countdown
-  startQrisTimer(15 * 60);
 }
 
 function startQrisTimer(seconds) {
@@ -1422,23 +1425,27 @@ async function checkQrisPayment() {
   btn.classList.add('checking');
 
   try {
-    // Konfirmasi pembayaran ke backend
-    const res  = await fetch(API_BASE + '/api/orders/' + qrisOrderId, {
-      method:  'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body:    JSON.stringify({ status: 'paid' }),
+    // Cek status pembayaran ke Midtrans via backend
+    const res  = await fetch(API_BASE + '/api/payment/status?orderId=' + qrisOrderId, {
+      headers: { 'Authorization': 'Bearer ' + token },
     });
     const data = await res.json();
-
     btn.classList.remove('checking');
 
     if (!res.ok) {
-      showToast('❌ ' + (data.error || 'Gagal konfirmasi pembayaran'));
+      showToast('❌ ' + (data.error || 'Gagal cek status'));
       return;
     }
 
-    clearInterval(qrisTimerInterval);
-    showPaymentSuccess(data.order);
+    if (data.status === 'paid') {
+      // ✅ Pembayaran terkonfirmasi dari Midtrans
+      clearInterval(qrisTimerInterval);
+      showPaymentSuccess(data);
+    } else {
+      // ⏳ Belum terbayar
+      showToast('⏳ Pembayaran belum diterima. Pastikan sudah scan QRIS.');
+      btn.querySelector('.check-lbl').textContent = '🔍 Cek lagi';
+    }
 
   } catch (err) {
     btn.classList.remove('checking');
@@ -1486,7 +1493,7 @@ function copyLicense() {
 }
 
 function copyDownloadLink() {
-  const url = 'https://github.com/MuhamadGhilbramZyaulhaq13/KasirkuPro/releases/download/app/KasirKuPro-1.0.msi';
+  const url = 'https://edlink.id/panel/classes/1657913/sections/24919383/7823346';
   navigator.clipboard.writeText(url).then(() => showToast('✅ Link download disalin!'));
 }
 
@@ -1569,6 +1576,7 @@ function handleLogout() {
   setTimeout(() => window.location.href = 'auth.html', 1500);
 }
 
+// Jalankan cek auth saat halaman dimuat
 initAuth();
 
 loadProductsFromAPI();
