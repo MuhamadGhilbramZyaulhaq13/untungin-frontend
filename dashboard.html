@@ -128,7 +128,13 @@
   }
   .info-row:last-child { border-bottom: none; }
   .info-label { color: var(--gray-600); }
-  .info-value { font-weight: 500; }
+  .info-value { 
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px; 
+  }
 
   /* ── DANGER ZONE ── */
   .danger-card {
@@ -210,16 +216,16 @@
       <!-- Side Nav -->
       <div class="side-nav">
         <a class="side-nav-item active" onclick="showSection('profile')">
-          <span>👤</span> Profil saya
+          <span><img src="https://api.iconify.design/material-symbols:person.svg" width="20" height="20" alt="Profile"></span> Profil saya
         </a>
         <a class="side-nav-item" onclick="showSection('security')">
-          <span>🔒</span> Keamanan
+          <span><img src="https://api.iconify.design/material-symbols:lock.svg" width="20" height="20" alt="Security"></span> Keamanan
         </a>
         <a class="side-nav-item" onclick="window.location.href='orders.html'">
-          <span>🧾</span> Riwayat pembelian
+          <span><img src="https://api.iconify.design/material-symbols:receipt.svg" width="20" height="20" alt="Orders"></span> Riwayat pembelian
         </a>
         <a class="side-nav-item" href="untungin.html">
-          <span>🛒</span> Belanja sekarang
+          <span><img src="https://api.iconify.design/material-symbols:shopping-cart.svg" width="20" height="20" alt="Shop"></span> Belanja sekarang
         </a>
       </div>
     </div>
@@ -267,7 +273,9 @@
           <div class="card-title">Info akun</div>
           <div class="info-row">
             <span class="info-label">Status akun</span>
-            <span class="info-value" style="color:var(--green)">✅ Aktif</span>
+            <span class="info-value" style="color:var(--black)">
+              <img src="https://api.iconify.design/material-symbols:check-circle.svg" width="20" height="20" alt="Active"> Aktif
+            </span>
           </div>
           <div class="info-row">
             <span class="info-label">Tanggal bergabung</span>

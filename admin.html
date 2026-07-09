@@ -145,13 +145,13 @@
   <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="side-label">Menu</div>
-    <div class="side-item active" onclick="showSection('products',this)"><span>📦</span> Produk</div>
-    <div class="side-item" onclick="showSection('users',this)"><span>👥</span> Pengguna</div>
-    <div class="side-item" onclick="showSection('orders',this)"><span>🧾</span> Transaksi</div>
-    <div class="side-item" onclick="showSection('reports',this)"><span>📊</span> Laporan</div>
+    <div class="side-item active" onclick="showSection('products',this)"><span><img src="https://api.iconify.design/mage:package-box-fill.svg" width="20" height="20" alt="package"></span> Produk</div>
+    <div class="side-item" onclick="showSection('users',this)"><span><img src="https://api.iconify.design/material-symbols:person.svg" width="20" height="20" alt="Pengguna"></span> Pengguna</div>
+    <div class="side-item" onclick="showSection('orders',this)"><span><img src="https://api.iconify.design/material-symbols:receipt.svg" width="20" height="20" alt="Transaksi"></span> Transaksi</div>
+    <div class="side-item" onclick="showSection('reports',this)"><span><img src="https://api.iconify.design/material-symbols:bar-chart.svg" width="20" height="20" alt="Laporan"></span> Laporan</div>
     <div class="side-label">Toko</div>
-    <div class="side-item" onclick="window.location.href='untungin.html'"><span>🛒</span> Lihat toko</div>
-    <div class="side-item" onclick="window.location.href='dashboard.html'"><span>⚙️</span> Profil saya</div>
+    <div class="side-item" onclick="window.location.href='untungin.html'"><span><img src="https://api.iconify.design/material-symbols:shopping-cart.svg" width="20" height="20" alt="Lihat toko"></span> Lihat toko</div>
+    <div class="side-item" onclick="window.location.href='dashboard.html'"><span><img src="https://api.iconify.design/material-symbols:settings.svg" width="20" height="20" alt="Profil saya"></span> Profil saya</div>
   </div>
 
   <!-- MAIN -->
@@ -220,7 +220,7 @@
             </tr>
           </thead>
           <tbody id="productsTable">
-            <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">Memuat produk...</div></div></td></tr>
+            <tr><td colspan="6"><div class="empty-state"><div class="empty-icon"><img src="https://api.iconify.design/guidance:time.svg" width="40" height="40" alt="memuat"></div><div class="empty-text">Memuat produk...</div></div></td></tr>
           </tbody>
         </table>
       </div>
@@ -243,7 +243,7 @@
         </div>
         <table>
           <thead><tr><th>Pengguna</th><th>Bisnis</th><th>Bergabung</th><th>Transaksi</th><th>Total Belanja</th></tr></thead>
-          <tbody id="usersTable"><tr><td colspan="5"><div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">Memuat...</div></div></td></tr></tbody>
+          <tbody id="usersTable"><tr><td colspan="5"><div class="empty-state"><div class="empty-icon"><img src="https://api.iconify.design/guidance:time.svg" width="40" height="40" alt="memuat"></div><div class="empty-text">Memuat...</div></div></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -271,7 +271,7 @@
         </div>
         <table>
           <thead><tr><th>Order ID</th><th>Pelanggan</th><th>Produk</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead>
-          <tbody id="ordersTable"><tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">Memuat...</div></div></td></tr></tbody>
+          <tbody id="ordersTable"><tr><td colspan="6"><div class="empty-state"><div class="empty-icon"><img src="https://api.iconify.design/guidance:time.svg" width="40" height="40" alt="memuat"></div><div class="empty-text">Memuat...</div></div></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -666,7 +666,13 @@ function renderOrders(orders) {
   }
   tbody.innerHTML = orders.map(o => {
     const sc = o.status === 'paid' ? 'badge-active' : o.status === 'pending' ? '' : '';
-    const sl = o.status === 'paid' ? '✅ Lunas' : o.status === 'pending' ? '⏳ Menunggu' : '❌ Batal';
+    
+    const sl = o.status === 'paid' 
+        ? '<span style="display: flex; align-items: center; gap: 4px;"><img src="https://api.iconify.design/material-symbols:check-circle.svg?color=%2316a34a" width="16" height="16" alt="Lunas"> lunas</span>' 
+        : o.status === 'pending' 
+        ? '<span style="display: flex; align-items: center; gap: 4px;"><img src="https://api.iconify.design/material-symbols:hourglass-empty.svg?color=%23d97706" width="16" height="16" alt="Menunggu"> Menunggu</span>' 
+        : '<span style="display: flex; align-items: center; gap: 4px;"><img src="https://api.iconify.design/material-symbols:cancel.svg?color=%239ca3af" width="16" height="16" alt="Batal"> Batal</span>';
+        
     const sc2 = o.status === 'paid' ? 'color:#16a34a' : o.status === 'pending' ? 'color:#d97706' : 'color:var(--gray-400)';
     const items = (o.items||[]).map(i => i.name).join(', ') || '—';
     return `

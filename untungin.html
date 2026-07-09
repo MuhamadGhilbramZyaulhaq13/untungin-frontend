@@ -281,6 +281,10 @@
   .pay-label { font-size: 12px; color: var(--gray-600); margin: 16px 0 8px; }
   .pay-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .pay-method {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     padding: 9px 8px; border: 1px solid var(--gray-200);
     border-radius: var(--radius-md); font-size: 12px; font-weight: 500;
     color: var(--gray-600); background: transparent; text-align: center;
@@ -673,10 +677,11 @@
   </ul>
   <div class="nav-actions">
     <div class="nav-search" onclick="document.getElementById('searchInput').focus()">
-      <span>🔍</span> Cari aplikasi...
+      <span><img src="https://api.iconify.design/material-symbols:search-rounded.svg" width="20" height="20" alt="search"></span> Cari aplikasi...
     </div>
     <button class="cart-badge btn" id="cartBtn">
-      🛒 <span class="cart-count" id="cartCount">0</span>
+      <img src="https://api.iconify.design/material-symbols:shopping-cart.svg" width="20" height="20" alt="cart">
+      <span class="cart-count" id="cartCount">0</span>
     </button>
     <!-- Ditampilkan saat belum login -->
     <div id="navGuest" style="display:flex;gap:8px;align-items:center">
@@ -686,10 +691,15 @@
     <!-- Ditampilkan saat sudah login -->
     <div id="navUser" style="display:none;gap:8px;align-items:center">
       <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-md);font-size:13px;background:var(--gray-50)">
-        👤 <span id="navUserName" style="font-weight:500;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">User</span>
+      <img src="https://api.iconify.design/material-symbols:person.svg" width="20" height="20" alt="user">
+      <span id="navUserName" style="font-weight:500;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">User</span>
       </div>
-      <button class="btn btn-ghost" onclick="window.location.href='dashboard.html'" title="Profil saya">⚙️</button>
-      <button class="btn btn-ghost" onclick="handleLogout()" title="Keluar" style="color:#dc2626;border-color:#fecaca">Keluar</button>
+      <button class="btn btn-ghost" onclick="window.location.href='dashboard.html'" title="Profil saya">
+        <img src="https://api.iconify.design/material-symbols:settings.svg" width="20" height="20" alt="settings">
+      </button>
+      <button class="btn btn-ghost" onclick="handleLogout()" title="Keluar" style="color:#dc2626;border-color:#fecaca">
+        <img src="https://api.iconify.design/material-symbols:logout.svg" width="20" height="20" alt="logout">
+      </button>
     </div>
   </div>
 </nav>
@@ -700,7 +710,7 @@
     <div class="hero-badge-dot"></div>
     Platform aplikasi bisnis #1 untuk UMKM Indonesia
   </div>
-  <h1>Kelola bisnis lebih cerdas, untung lebih besar</h1>
+  <h1>Kelola bisnis lebih cerdas untung lebih besar</h1>
   <p>Temukan aplikasi keuangan dan kasir terbaik untuk bisnis kamu. Pilih, berlangganan, dan langsung pakai.</p>
   <div class="hero-cta">
     <button class="btn-lg btn-lg-solid" onclick="document.getElementById('produk').scrollIntoView({behavior:'smooth'})">Jelajahi aplikasi →</button>
@@ -712,11 +722,11 @@
       <div class="stat-lbl">Pengguna aktif</div>
     </div>
     <div>
-      <div class="stat-num">48</div>
+      <div class="stat-num">1</div>
       <div class="stat-lbl">Aplikasi tersedia</div>
     </div>
     <div>
-      <div class="stat-num">4.9 ⭐</div>
+      <div class="stat-num">4,9 <img src="https://api.iconify.design/material-symbols:star-rounded.svg" width="30" height="35" alt="star" style="vertical-align: text-bottom;"></div>
       <div class="stat-lbl">Rating rata-rata</div>
     </div>
     <div>
@@ -728,7 +738,8 @@
 
 <!-- FINTECH STRIP -->
 <div class="fintech-strip">
-  🔒 Pembayaran aman & terenkripsi via:
+  <img src="https://api.iconify.design/material-symbols:encrypted-outline-rounded.svg" width="20" height="20" alt="encrypted">
+  Pembayaran aman & terenkripsi via:
   <span class="fintech-badge">Midtrans</span>
   <span class="fintech-badge">Xendit</span>
   <span class="fintech-badge">QRIS</span>
@@ -742,9 +753,13 @@
 <!-- CATALOG -->
 <section class="section" id="produk">
   <div class="search-bar">
-    <span class="search-icon">🔍</span>
+    <span class="search-icon">
+      <img src="https://api.iconify.design/material-symbols:search-rounded.svg" width="20" height="20" alt="search">
+    </span>
     <input type="text" id="searchInput" placeholder="Cari aplikasi kasir, pembukuan, payroll, inventory...">
-    <span class="filter-icon">⚙️</span>
+    <span class="filter-icon">
+      <img src="https://api.iconify.design/material-symbols:filter-list.svg" width="20" height="20" alt="filter">
+    </span>
   </div>
   <div class="cats" id="catButtons">
     <button class="cat-btn active" data-cat="semua">Semua</button>
@@ -771,32 +786,56 @@
   </div>
   <div class="features-grid">
     <div class="feature-card">
-      <div class="feature-icon">🚀</div>
+    <div class="feature-icon">
+      <img src="https://api.iconify.design/lucide:rocket.svg" 
+          width="40" height="40" 
+          alt="rocket">
+    </div>
       <div class="feature-title">Langsung pakai, tanpa ribet</div>
       <div class="feature-desc">Berlangganan sekarang, akses instan dalam 60 detik. Tidak perlu instalasi atau konfigurasi teknis yang rumit.</div>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">🔒</div>
+    <div class="feature-icon">
+      <img src="https://api.iconify.design/material-symbols:encrypted-outline-rounded.svg" 
+          width="40" height="40" 
+          alt="letsencrypt">
+    </div>
       <div class="feature-title">Keamanan data terjamin</div>
       <div class="feature-desc">Data keuangan bisnis kamu dienkripsi dan disimpan di server Indonesia. Terdaftar dan diawasi OJK.</div>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">💳</div>
+    <div class="feature-icon">
+      <img src="https://api.iconify.design/iconoir:mastercard-card.svg" 
+          width="40" height="40" 
+          alt="mastercard">
+    </div>
       <div class="feature-title">Pembayaran fleksibel</div>
       <div class="feature-desc">Bayar via QRIS, transfer bank, e-wallet, atau kartu kredit/debit. Cicilan 0% tersedia untuk paket tahunan.</div>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">📞</div>
+    <div class="feature-icon">
+      <img src="https://api.iconify.design/mdi:phone.svg" 
+          width="40" height="40" 
+          alt="phone">
+    </div>
       <div class="feature-title">Dukungan 24/7</div>
       <div class="feature-desc">Tim support siap membantu via WhatsApp, live chat, atau telepon kapanpun kamu butuhkan.</div>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">📊</div>
+    <div class="feature-icon">
+      <img src="https://api.iconify.design/mdi:file-document.svg" 
+          width="40" height="40" 
+          alt="file-document">
+    </div>
       <div class="feature-title">Laporan otomatis</div>
       <div class="feature-desc">Laporan keuangan, penjualan, dan stok dibuat otomatis setiap hari. Ekspor ke Excel atau PDF dengan satu klik.</div>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">🔗</div>
+    <div class="feature-icon">
+      <img src="https://api.iconify.design/line-md:link.svg" 
+          width="40" height="40" 
+          alt="link">
+    </div>
       <div class="feature-title">Integrasi ekosistem</div>
       <div class="feature-desc">Hubungkan dengan Tokopedia, Shopee, Lazada, GoBiz, dan ratusan platform lain yang sudah kamu gunakan.</div>
     </div>
@@ -815,7 +854,9 @@
     <div class="cart-panel-sub" id="cartSubtitle">0 item dipilih</div>
     <div id="cartItems">
       <div style="text-align:center; padding:40px 0; color:var(--gray-400)">
-        <div style="font-size:40px; margin-bottom:10px">🛒</div>
+        <div style="font-size:40px; margin-bottom:10px">
+          <img src="https://api.iconify.design/material-symbols:shopping-cart.svg" width="40" height="40" alt="cart">
+        </div>
         <div style="font-size:14px">Keranjang masih kosong.</div>
         <div style="font-size:12px; margin-top:4px">Tambahkan aplikasi dari katalog di atas.</div>
       </div>
@@ -837,13 +878,13 @@
 
     <div class="pay-label">Metode pembayaran</div>
     <div class="pay-methods">
-      <button class="pay-method" data-pay="kartu" onclick="selectPay(this)">💳 Kartu</button>
-      <button class="pay-method active" data-pay="qris" onclick="selectPay(this)">📱 QRIS</button>
-      <button class="pay-method" data-pay="transfer" onclick="selectPay(this)">🏦 Transfer</button>
-      <button class="pay-method" data-pay="ewallet" onclick="selectPay(this)">💚 e-Wallet</button>
+      <button class="pay-method" data-pay="kartu" onclick="selectPay(this)"><img src="https://api.iconify.design/material-symbols:credit-card.svg" width="20" height="20" alt="Kartu"> Kartu</button>
+      <button class="pay-method active" data-pay="qris" onclick="selectPay(this)"><img src="https://api.iconify.design/material-symbols:qr-code.svg" width="20" height="20" alt="QRIS"> QRIS</button>
+      <button class="pay-method" data-pay="transfer" onclick="selectPay(this)"><img src="https://api.iconify.design/material-symbols:account-balance.svg" width="20" height="20" alt="Transfer"> Transfer</button>
+      <button class="pay-method" data-pay="ewallet" onclick="selectPay(this)"><img src="https://api.iconify.design/ic:round-account-balance-wallet.svg" width="20" height="20" alt="e-Wallet"> e-Wallet</button>
     </div>
     <button class="checkout-btn" id="checkoutBtn" onclick="handleCheckout()">Bayar dengan QRIS →</button>
-    <div class="secure-note">🔒 Transaksi aman & terenkripsi SSL</div>
+    <div class="secure-note"> <img src="https://api.iconify.design/material-symbols:encrypted-outline-rounded.svg" width="15" height="15" alt="encrypted"> Transaksi aman & terenkripsi SSL</div>
   </div>
 </div>
 
@@ -886,7 +927,7 @@
 </footer>
 <div class="footer-bottom">
   <span>© 2025 PT Untungin Teknologi Indonesia. Hak cipta dilindungi.</span>
-  <div class="ojk-badge">🏦 Terdaftar & diawasi OJK</div>
+  <div class="ojk-badge"><img src="https://api.iconify.design/mdi:bank.svg" width="20" height="20" alt="OJK"> Terdaftar & diawasi OJK</div>
 </div>
 
 <!-- MODAL -->
@@ -950,7 +991,7 @@
           </div>
           <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--gray-400);margin-top:12px">QRIS</div>
           <div class="qris-label">
-            🔒 Scan dengan aplikasi e-wallet apapun
+          <img src="https://api.iconify.design/material-symbols:qr-code.svg" width="20" height="20" alt="QR Code"> Scan dengan aplikasi e-wallet apapun
           </div>
           <div class="qris-apps">
             <span class="qris-app-badge">GoPay</span>
@@ -971,16 +1012,16 @@
         <!-- Cek Pembayaran Button -->
         <button class="qris-check-btn" id="qrisCheckBtn" onclick="checkQrisPayment()">
           <div class="spin"></div>
-          <span class="check-lbl">🔍 Cek status pembayaran</span>
+          <span class="check-lbl">Cek status pembayaran</span>
         </button>
-        <div class="qris-note">🔒 Pembayaran terenkripsi & aman · Diawasi OJK</div>
+        <div class="qris-note"><img src="https://api.iconify.design/material-symbols:lock.svg" width="15" height="15" alt="Lock"> Pembayaran terenkripsi & aman · Diawasi OJK</div>
       </div>
     </div>
 
     <!-- ── SCREEN 2: SUCCESS + DOWNLOAD ── -->
     <div class="qris-screen" id="qrisScreen2">
       <div class="dl-header">
-        <div class="dl-success-icon">🎉</div>
+        <div class="dl-success-icon"><img src="https://api.iconify.design/fluent-emoji-flat:party-popper.svg" width="40" height="40" alt="Success"></div>
         <div class="dl-title">Pembayaran berhasil!</div>
         <div class="dl-subtitle" id="dlSubtitle">Transaksi dikonfirmasi — unduh aplikasi kamu sekarang</div>
       </div>
@@ -1004,13 +1045,13 @@
 
         <!-- Email Note -->
         <div class="dl-email-note">
-          ✅ Detail lisensi & invoice sudah dikirim ke email kamu
+          <img src="https://api.iconify.design/material-symbols:check-circle.svg" width="20" height="20" alt="Check"> Detail lisensi & invoice sudah dikirim ke email kamu
         </div>
 
         <!-- Download Link -->
         <div class="dl-section-title">Unduh aplikasi yang dibeli</div>
         <div class="dl-link-box">
-          <div class="dl-link-icon">📦</div>
+          <div class="dl-link-icon"><img src="https://api.iconify.design/fluent-emoji-flat:package.svg" width="60" height="60" alt="package"></div>
           <div class="dl-link-text">link berikut untuk mengunduh aplikasi:</div>
           <a href="https://github.com/MuhamadGhilbramZyaulhaq13/KasirkuPro/releases/download/app/KasirKuPro-1.0.msi"
              target="_blank"
@@ -1019,7 +1060,7 @@
             KasirKuPro-1.0.msi
           </a>
           <div class="dl-link-meta">
-            🔒 Link aktif selama 30 hari &nbsp;·&nbsp; 📋 Salin link
+            <img src="https://api.iconify.design/material-symbols:lock.svg" width="15" height="15" alt="Lock"> Link aktif selama 30 hari &nbsp;·&nbsp; <img src="https://api.iconify.design/material-symbols:content-copy.svg" width="15" height="15" alt="Copy"> Salin link
             <span class="dl-copy-link" onclick="copyDownloadLink()">Salin</span>
           </div>
         </div>
@@ -1385,7 +1426,7 @@ async function openQrisModal() {
     // Reset check button
     const btn = document.getElementById('qrisCheckBtn');
     btn.classList.remove('checking');
-    btn.querySelector('.check-lbl').textContent = '🔍 Cek status pembayaran';
+    btn.querySelector('.check-lbl').textContent = 'Cek status pembayaran';
 
     // Hitung sisa waktu dari expiry Midtrans
     const expiryMs = data.qrisExpiry
@@ -1444,7 +1485,7 @@ async function checkQrisPayment() {
     } else {
       // ⏳ Belum terbayar
       showToast('⏳ Pembayaran belum diterima. Pastikan sudah scan QRIS.');
-      btn.querySelector('.check-lbl').textContent = '🔍 Cek lagi';
+      btn.querySelector('.check-lbl').textContent = 'Cek lagi';
     }
 
   } catch (err) {

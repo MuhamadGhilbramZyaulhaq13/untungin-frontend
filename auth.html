@@ -133,10 +133,10 @@
       <h1 class="left-headline">Satu platform,<br><span>semua kebutuhan</span><br>bisnis kamu</h1>
       <p class="left-desc">Bergabung dengan lebih dari 12.000 pelaku UMKM yang sudah mempercayakan manajemen bisnis mereka kepada Untungin.</p>
       <div class="left-features">
-        <div class="left-feature"><div class="left-feature-icon">🚀</div><div class="left-feature-text"><strong>Mulai dalam 60 detik.</strong> Tidak perlu kartu kredit, langsung pakai.</div></div>
-        <div class="left-feature"><div class="left-feature-icon">🔒</div><div class="left-feature-text"><strong>Data aman & terenkripsi.</strong> Server di Indonesia, terdaftar OJK.</div></div>
-        <div class="left-feature"><div class="left-feature-icon">💳</div><div class="left-feature-text"><strong>Bayar pakai apa saja.</strong> QRIS, transfer, GoPay, OVO, dan lainnya.</div></div>
-        <div class="left-feature"><div class="left-feature-icon">📞</div><div class="left-feature-text"><strong>Dukungan 24/7.</strong> Tim support siap via WhatsApp kapanpun.</div></div>
+        <div class="left-feature"><div class="left-feature-icon"><img src="https://api.iconify.design/lucide:rocket.svg?color=white" width="20" height="20" alt="Rocket"></div><div class="left-feature-text"><strong>Mulai dalam 60 detik.</strong> Tidak perlu kartu kredit, langsung pakai.</div></div>
+        <div class="left-feature"><div class="left-feature-icon"><img src="https://api.iconify.design/material-symbols:encrypted-outline-rounded.svg?color=white" width="20" height="20" alt="Lock"></div><div class="left-feature-text"><strong>Data aman & terenkripsi.</strong> Server di Indonesia, terdaftar OJK.</div></div>
+        <div class="left-feature"><div class="left-feature-icon"><img src="https://api.iconify.design/material-symbols:credit-card.svg?color=white" width="20" height="20" alt="Credit Card"></div><div class="left-feature-text"><strong>Bayar pakai apa saja.</strong> QRIS, transfer, GoPay, OVO, dan lainnya.</div></div>
+        <div class="left-feature"><div class="left-feature-icon"><img src="https://api.iconify.design/mdi:phone.svg?color=white" width="20" height="20" alt="Phone"></div><div class="left-feature-text"><strong>Dukungan 24/7.</strong> Tim support siap via WhatsApp kapanpun.</div></div>
       </div>
     </div>
     <div class="left-bottom">
@@ -159,8 +159,8 @@
         <div class="auth-title">Selamat datang kembali</div>
         <div class="auth-sub">Masuk ke dashboard bisnis kamu</div>
         <div class="social-btns">
-          <button class="social-btn" onclick="handleSocial('Google')"><span>🔵</span> Google</button>
-          <button class="social-btn" onclick="handleSocial('Facebook')"><span>🟦</span> Facebook</button>
+          <button class="social-btn" onclick="handleSocial('Google')"><span><img src="https://api.iconify.design/logos:google-icon.svg" width="20" height="20" alt="Google"></span></button>
+          <button class="social-btn" onclick="handleSocial('Facebook')"><span><img src="https://api.iconify.design/logos:facebook.svg" width="20" height="20" alt="Facebook"></span></button>
         </div>
         <div class="divider-text">atau masuk dengan email</div>
         <div id="loginView">
@@ -175,7 +175,7 @@
             <label class="form-label">Kata sandi</label>
             <div class="form-input-wrap">
               <input type="password" class="form-input" id="loginPw" placeholder="Minimal 8 karakter">
-              <span class="form-input-icon" onclick="togglePw('loginPw', this)">👁️</span>
+              <span class="form-input-icon" onclick="togglePw('loginPw', this)"><img src="https://api.iconify.design/material-symbols:visibility.svg" width="20" height="20" alt="Hide"></span>
             </div>
           </div>
           <a class="forgot-link" onclick="showForgot()">Lupa kata sandi?</a>
@@ -216,7 +216,7 @@
           <div class="auth-title">Buat akun baru</div>
           <div class="auth-sub">Langkah 1 dari 3 — Info akun</div>
           <div class="social-btns">
-            <button class="social-btn" onclick="handleSocial('Google')"><span>🔵</span> Lanjut dengan Google</button>
+            <button class="social-btn" onclick="handleSocial('Google')"><span><img src="https://api.iconify.design/logos:google-icon.svg" width="20" height="20" alt="Google"></span> Lanjut dengan Google</button>
           </div>
           <div class="divider-text">atau daftar dengan email</div>
           <div class="form-row">
@@ -240,7 +240,7 @@
             <label class="form-label">Kata sandi</label>
             <div class="form-input-wrap">
               <input type="password" class="form-input" id="regPw" placeholder="Buat kata sandi kuat" oninput="checkStrength(this.value)">
-              <span class="form-input-icon" onclick="togglePw('regPw', this)">👁️</span>
+              <span class="form-input-icon" onclick="togglePw('regPw', this)"><img src="https://api.iconify.design/material-symbols:visibility.svg" width="20" height="20" alt="Show"></span>
             </div>
             <div class="pw-strength">
               <div class="pw-bars">
@@ -333,7 +333,7 @@
         </div>
       </div>
 
-      <div class="auth-footer-note">🔒 Koneksi aman SSL · Terdaftar OJK · Data tersimpan di Indonesia</div>
+      <div class="auth-footer-note"><img src="https://api.iconify.design/material-symbols:lock.svg" width="16" height="16" alt="Lock"> Koneksi aman SSL · Terdaftar OJK · Data tersimpan di Indonesia</div>
     </div>
   </div>
 </div>
@@ -513,8 +513,13 @@ function validateEmail(inputId, errId) {
 }
 function togglePw(id, icon) {
   const inp = document.getElementById(id);
-  if (inp.type === 'password') { inp.type = 'text'; icon.textContent = '🙈'; }
-  else { inp.type = 'password'; icon.textContent = '👁️'; }
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    icon.innerHTML = '<img src="https://api.iconify.design/material-symbols:visibility-off.svg" width="20" height="20" alt="Hide">';
+  } else {
+    inp.type = 'password';
+    icon.innerHTML = '<img src="https://api.iconify.design/material-symbols:visibility.svg" width="20" height="20" alt="Show">';
+  }
 }
 function checkStrength(pw) {
   const bars = [1,2,3,4].map(i => document.getElementById('pwBar' + i));

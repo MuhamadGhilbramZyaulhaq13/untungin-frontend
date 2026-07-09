@@ -202,7 +202,7 @@ function renderOrders(orders) {
 
   list.innerHTML = orders.map(o => {
     const statusClass = o.status === 'paid' ? 'status-paid' : o.status === 'pending' ? 'status-pending' : 'status-cancelled';
-    const statusLabel = o.status === 'paid' ? '✅ Lunas' : o.status === 'pending' ? '⏳ Menunggu' : '❌ Dibatalkan';
+    const statusLabel = o.status === 'paid' ? '<img src="https://api.iconify.design/material-symbols:check-circle.svg?color=green" width="20" height="20" alt="Paid"> Lunas' : o.status === 'pending' ? '<img src="https://api.iconify.design/material-symbols:hourglass-empty.svg" width="20" height="20" alt="Pending"> Menunggu' : '<img src="https://api.iconify.design/material-symbols:cancel.svg" width="20" height="20" alt="Cancelled">License Dibatalkan';
 
     const itemsHtml = (o.items || []).map(item => `
       <div class="order-item">
@@ -220,13 +220,13 @@ function renderOrders(orders) {
     const licenseHtml = o.status === 'paid' && o.licenseKey ? `
       <div class="license-box">
         <div>
-          <div style="font-size:11px;color:var(--green);font-weight:500;margin-bottom:3px">🔑 License Key</div>
+          <div style="font-size:11px;color:var(--green);font-weight:500;margin-bottom:3px"><img src="https://api.iconify.design/solar:key-linear.svg?color=green" width="10" height="10" alt="License Key"> License Key</div>
           <div class="license-key">${o.licenseKey}</div>
         </div>
         <span class="license-copy" onclick="copyText('${o.licenseKey}', 'License key disalin!')">Salin</span>
       </div>
       <a href="${o.downloadUrl || '#'}" target="_blank" class="download-link">
-        ⬇️ <span>Klik untuk download aplikasi</span>
+        <img src="https://api.iconify.design/material-symbols:download.svg" width="20" height="20" alt="Download"> <span>Klik untuk download aplikasi</span>
         <span style="margin-left:auto;font-size:11px;color:var(--gray-400)">→</span>
       </a>
     ` : '';
