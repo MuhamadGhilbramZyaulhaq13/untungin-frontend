@@ -893,11 +893,19 @@
   <div class="footer-brand">
     <div class="nav-logo" style="font-size:17px"><div class="nav-logo-dot"></div>Untungin</div>
     <p>Platform aplikasi bisnis terpercaya untuk UMKM Indonesia. Kelola keuangan, kasir, dan operasional dalam satu tempat.</p>
-    <div style="display:flex;gap:8px;margin-top:16px">
-      <span style="font-size:20px; cursor:pointer">📘</span>
-      <span style="font-size:20px; cursor:pointer">📷</span>
-      <span style="font-size:20px; cursor:pointer">🐦</span>
-      <span style="font-size:20px; cursor:pointer">💬</span>
+    <div style="display:flex;gap:12px;margin-top:16px;align-items:center">
+      <a href="#" title="Facebook">
+        <img src="https://cdn.simpleicons.org/facebook/6b6b67" width="20" height="20">
+      </a>
+      <a href="#" title="Instagram">
+        <img src="https://cdn.simpleicons.org/instagram/6b6b67" width="20" height="20">
+      </a>
+      <a href="#" title="X / Twitter">
+        <img src="https://cdn.simpleicons.org/x/6b6b67" width="20" height="20">
+      </a>
+      <a href="#" title="WhatsApp">
+        <img src="https://cdn.simpleicons.org/whatsapp/6b6b67" width="20" height="20">
+      </a>
     </div>
   </div>
   <div class="footer-col">
@@ -1111,7 +1119,7 @@ const catIcon = {
 async function loadProductsFromAPI() {
   const grid = document.getElementById('productsGrid');
   grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray-400)">
-    <div style="font-size:32px;margin-bottom:8px">⏳</div>
+    <div style="font-size:32px;margin-bottom:8px"><img src="https://api.iconify.design/guidance:time.svg" width="32" height="32" alt="Loading"></div>
     <div>Memuat produk...</div>
   </div>`;
 
