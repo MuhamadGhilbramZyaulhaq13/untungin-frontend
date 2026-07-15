@@ -9,10 +9,8 @@
 
 ## 🌐 Live URL
 
+
 ```
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/4c948145-c007-44fd-bcf8-eec1259f3da8" />
-
-
 https://untunginid.netlify.app
 ```
 
