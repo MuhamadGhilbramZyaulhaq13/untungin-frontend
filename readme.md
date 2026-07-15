@@ -2,7 +2,7 @@
 
 > Platform aplikasi bisnis & kasir untuk UMKM Indonesia
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/your-badge-id/deploy-status)](https://untunginid.netlify.app)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/9f1ce6aa-5fb9-4e12-a7c7-6f5f056822d7/deploy-status)](https://untunginid.netlify.app)
 [![Live](https://img.shields.io/badge/Live-untunginid.netlify.app-brightgreen)](https://untunginid.netlify.app)
 
 ---
